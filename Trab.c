@@ -2,14 +2,17 @@
 #include <string.h>
 #include <conio2.h>
 #include <stdlib.h>
-#include "tad.h"
 
-int main(){
-    Unidade *unid;
+#include "Tad.h"
+
+int main() {
+    Unidade *unid = NULL;
     DBF *dbf;
     unsigned int op;
 
-    DefaltTo(&unid);
+    setDefaltTo(&unid, "C:");
+    printf("%s\n", unid->und); system("pause");
+    
     criarDBF(&dbf,"Lucas",12012025,13);
     op = Menu1(op);
     switch (op){

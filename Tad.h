@@ -1,42 +1,84 @@
+struct unidade {
+    struct unidade *top;
+    char und[2];
+    struct dbf *arqs;
+    struct unidade *bottom;
+};
+typedef struct unidade Unidade;
 
-struct Campo {
+struct dbf {
+    struct dbf *ant;
+    char nomeDBF[50];
+    char Data[11]; // "DD/MM/YYYY"
+    char Hora[6];  // "HH:MM"
+    struct status* status; // 'A' = Aberto, 'F' = Fechado
+    struct campo *campos; // Lista encadeada de campos
+    struct dbf *prox;
+
+    //NAO TEM ESSE CAMPO NA REPRESENTAÇÃO
+    union Registro *registros; // Lista encadeada de registros
+};
+typedef struct dbf DBF;
+
+struct status {
+    char boolean;
+    struct status* prox;
+};
+
+struct campo {
+    union dados* Patual;
     char FieldName[50];
     char Type; // 'N' = Número, 'D' = Data, 'L' = Lógico, 'C' = Caracter, 'M' = Memo
     int Width;
     int Dec;
-    
-    struct Campo *prox;
+    union dados* Pdados;
+    struct campo *prox;
 };
+typedef struct campo Campo;
 
-struct Unidade{
-    struct Unidade *top;
-    char unid[2];
-    struct DBF *arqs;
-    struct Unidade *bottom;
-};
-
-union Registro {
+union dados {
     float valorN;
     char valorD[10]; // "DD/MM/YYYY"
     char valorL; // 'T' ou 'F'
     char valorC[50];
     char valorM[50];
+    union dados* prox;
 };
+typedef union dados Dados;
 
-struct DBF{
-    char nomeDBF[50];
-    char Data[11]; // "DD/MM/YYYY"
-    char Hora[6];  // "HH:MM"
-    char status; // 'A' = Aberto, 'F' = Fechado
-    struct Campo *campos; // Lista encadeada de campos
-    union Registro *registros; // Lista encadeada de registros
-    struct DBF *prox;
-    struct DBF *ant;
-};
-
-typedef struct DBF DBF;
-typedef struct Campo Campo;
-typedef struct Unidade Unidade;
+void setDefaltTo(Unidade **unid, char dir[2]) {
+    Unidade *C = NULL, *D = NULL;
+    
+    //Diretorios C e D nao existem
+    if (*unid == NULL) {
+        D = (Unidade *)malloc(sizeof(Unidade));
+        C = (Unidade *)malloc(sizeof(Unidade));
+        //D:
+        D->top = NULL;
+        D->arqs = NULL;
+        strcpy(D->und, "D:");
+        D->bottom = C;
+        //C:
+        C->top = D;
+        C->arqs = NULL;
+        strcpy(C->und, "C:");
+        C->bottom = NULL;
+        
+        if (strcmp(dir, "C:") == 0) {
+            *unid = C;
+        } else {
+            *unid = D;
+        }
+    }
+    //Diretorios C e D existem
+    else {
+        //Unidade atual diferente da solicitada
+        if (strcmp((*unid)->und, dir) != 0) {
+            //Aponta para a outra unidade
+            *unid = ((*unid)->bottom != NULL) ? (*unid)->bottom : (*unid)->top;
+        }
+    }
+} 
 
 void criarDBF(DBF **dbf, char nome[50],int data,int hr) {
     DBF *aux, *atual;
@@ -68,24 +110,6 @@ void criarDBF(DBF **dbf, char nome[50],int data,int hr) {
         
     }
 }
-
-void DefaltTo(Unidade **Uni){
-    Unidade *C = (Unidade *)malloc(sizeof(Unidade));
-    Unidade *D = (Unidade *)malloc(sizeof(Unidade));
-
-    //C:
-    C->top = D;
-    C->bottom = NULL;
-    strcpy(C->unid,"C:");
-    C->arqs = NULL;
-
-    //D:
-    D->top = C;
-    D->bottom = NULL;
-    strcpy(D->unid,"D:");
-    D->arqs = NULL;
-
-} 
 
 void quit(){
     gotoxy(30, 15);
