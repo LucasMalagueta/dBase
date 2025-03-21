@@ -1,40 +1,46 @@
+typedef struct unidade Unidade;
+typedef struct dbf DBF;
+typedef struct status Status;
+typedef struct campo Campo;
+typedef union dados Dados;
+
 struct unidade {
     struct unidade *top;
     char und[2];
     struct dbf *arqs;
     struct unidade *bottom;
 };
-typedef struct unidade Unidade;
 
 struct dbf {
-    struct dbf *ant;
+    DBF *ant;
     char nomeDBF[50];
     char Data[11]; // "DD/MM/YYYY"
     char Hora[6];  // "HH:MM"
-    struct status* status; // 'A' = Aberto, 'F' = Fechado
-    struct campo *campos; // Lista encadeada de campos
-    struct dbf *prox;
+    Status* status; // 'A' = Aberto, 'F' = Fechado
+    Campo *campos; // Lista encadeada de campos
+    DBF *prox;
 
     //NAO TEM ESSE CAMPO NA REPRESENTAÇÃO
     union Registro *registros; // Lista encadeada de registros
 };
-typedef struct dbf DBF;
+
 
 struct status {
     char boolean;
-    struct status* prox;
+    Status* prox;
 };
 
+
 struct campo {
-    union dados* Patual;
+    Dados* Patual;
     char FieldName[50];
     char Type; // 'N' = Número, 'D' = Data, 'L' = Lógico, 'C' = Caracter, 'M' = Memo
     int Width;
     int Dec;
-    union dados* Pdados;
-    struct campo *prox;
+    Dados* Pdados;
+    Campo *prox;
 };
-typedef struct campo Campo;
+
 
 union dados {
     float valorN;
@@ -42,9 +48,9 @@ union dados {
     char valorL; // 'T' ou 'F'
     char valorC[50];
     char valorM[50];
-    union dados* prox;
+    Dados* prox;
 };
-typedef union dados Dados;
+
 
 void setDefaltTo(Unidade **unid, char dir[2]) {
     Unidade *C = NULL, *D = NULL;
@@ -80,35 +86,36 @@ void setDefaltTo(Unidade **unid, char dir[2]) {
     }
 } 
 
-void criarDBF(DBF **dbf, char nome[50],int data,int hr) {
-    DBF *aux, *atual;
-    FILE *ptr = fopen("Dados.dbf", "wb+");
+void criarDBF(Unidade **unid, DBF **dbf, char nome[50],int data,int hr) {
+    DBF *aux, *atual = NULL;
 
+    //Preenche o aux com as informaçoes do novo arquivo .DBF
     aux = (DBF *)malloc(sizeof(DBF));
     strcpy(aux->nomeDBF,nome);
-    *aux->Hora = hr;
-    *aux->Data = data;
+    strcpy(aux->Data,data);
+    strcpy(aux->Hora,hr);
+    aux->campos = NULL;
+    aux->status = NULL;
 
-    if(ptr != NULL){
-        fprintf(ptr,"%s",aux->nomeDBF);
-        fprintf(ptr,"|");
-        fprintf(ptr,"%d|",aux->Data);
-        fprintf(ptr,"%d|",aux->Hora);
-
-    }
-
+    //Se nao existir arquivo .dbf
     if(*dbf == NULL){
         *dbf = aux;
-    }else{
+        aux->ant = NULL;
+
+        (*unid)->arqs = *dbf;
+    }
+    //Existe arquivos .dbf
+    else{
+        //Aponta o ultimo arquivo .DBF para o novo arquivo(aux)
         atual = *dbf;
         while(atual ->prox != NULL){
             atual = atual->prox;
         }
         aux->ant = atual;
         atual->prox = aux;
-        aux->prox = NULL;
         
     }
+    aux->prox = NULL;
 }
 
 void quit(){

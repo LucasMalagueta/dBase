@@ -10,10 +10,19 @@ int main() {
     DBF *dbf;
     unsigned int op;
 
-    setDefaltTo(&unid, "C:");
-    printf("%s\n", unid->und); system("pause");
+    setDefaltTo(&unid, "D:");
+    printf("%s\n", unid->und); 
     
-    criarDBF(&dbf,"Lucas",12012025,13);
+    criarDBF(&unid,&dbf,"Lucas","12/01/2025","13:00:00");
+
+    printf("%s\n", unid->arqs->nomeDBF);
+
+    criarDBF(&unid,&dbf,"Matias","17/01/2035","11:00:00");
+
+    printf("%s\n", unid->arqs->prox->nomeDBF);
+    system("pause");
+    
+
     op = Menu1(op);
     switch (op){
         case 1:
