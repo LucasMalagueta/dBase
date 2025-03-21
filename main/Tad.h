@@ -7,7 +7,7 @@ typedef union dados Dados;
 struct unidade {
     struct unidade *top;
     char und[2];
-    struct dbf *arqs;
+    DBF *arqs;
     struct unidade *bottom;
 };
 
@@ -15,7 +15,7 @@ struct dbf {
     DBF *ant;
     char nomeDBF[50];
     char Data[11]; // "DD/MM/YYYY"
-    char Hora[6];  // "HH:MM"
+    char Hora[8];  // "HH:MM"
     Status* status; // 'A' = Aberto, 'F' = Fechado
     Campo *campos; // Lista encadeada de campos
     DBF *prox;
@@ -86,7 +86,7 @@ void setDefaltTo(Unidade **unid, char dir[2]) {
     }
 } 
 
-void criarDBF(Unidade **unid, DBF **dbf, char nome[50],int data,int hr) {
+void criarDBF(Unidade **unid, DBF **dbf, char nome[50],char data[11],char hr[8]) {
     DBF *aux, *atual = NULL;
 
     //Preenche o aux com as informaçoes do novo arquivo .DBF
@@ -116,6 +116,17 @@ void criarDBF(Unidade **unid, DBF **dbf, char nome[50],int data,int hr) {
         
     }
     aux->prox = NULL;
+}
+
+void Dir(Unidade **unid){
+    DBF *aux;
+
+    aux = (*unid)->arqs;
+    printf("%s",(*unid)->und);
+    while(aux != NULL){
+        printf("\\%s\n",aux->nomeDBF);
+        aux = aux->prox;
+    }
 }
 
 void quit(){

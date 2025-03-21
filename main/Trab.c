@@ -20,6 +20,8 @@ int main() {
     criarDBF(&unid,&dbf,"Matias","17/01/2035","11:00:00");
 
     printf("%s\n", unid->arqs->prox->nomeDBF);
+
+    Dir(&unid);
     system("pause");
     
 
