@@ -143,14 +143,19 @@ void quit(){
 //6
 ListStructure(Unidade *unid, DBF *dbf){
     Campo *campos = dbf->campos;
+    int i = 1;
     if(unid !=NULL && unid->arqs !=NULL){
         printf("Structure for database: %s%s\n",unid->und,dbf->nomeDBF);
         printf("Number of the data records: \n");
         printf("Date of the last update: %s\n",dbf->Data);
+        printf("Field      Field Name      Type      Width      Dec",dbf->Data);
 
         while(campos != NULL){
-            printf()
+            printf("%d      %s      %d      %d      %d\n",i++,campos->FieldName,campos->Type,campos->Width,campos->Dec);
+            campos = campos->prox;
         }
+    }else{
+        printf("Caminho inexistente!\n");
     }
     
 }
