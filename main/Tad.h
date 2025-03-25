@@ -141,7 +141,7 @@ void quit(){
 }
 
 //6
-ListStructure(Unidade *unid, DBF *dbf){
+void ListStructure(Unidade *unid, DBF *dbf){
     Campo *campos = dbf->campos;
     int i = 1;
     if(unid !=NULL && unid->arqs !=NULL){
