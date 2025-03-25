@@ -79,18 +79,14 @@ int main() {
 
     system("pause");
 
-    setDefaltTo(&unid, "D:");
-    printf("%s\n", unid->und); 
+    setDefaltTo(&unid, "D:"); 
     
-    criarDBF(&unid,&dbf,"Lucas","12/01/2025","13:00:00");
-
-    printf("%s\n", unid->arqs->nomeDBF);
-
-    criarDBF(&unid,&dbf,"Matias","17/01/2035","11:00:00");
-
-    printf("%s\n", unid->arqs->prox->nomeDBF);
+    Create(&unid,&dbf,"Lucas.dbf","12/01/2025","13:00:00");
+    Create(&unid,&dbf,"Matias.dbf","17/01/2035","11:00:00");
 
     Dir(&unid);
+
+    ListStructure(unid, dbf);
     system("pause");
     
     // op = Menu1(op);

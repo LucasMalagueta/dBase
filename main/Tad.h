@@ -124,9 +124,10 @@ void Dir(Unidade **unid){
     DBF *aux;
 
     aux = (*unid)->arqs;
-    printf("%s",(*unid)->und);
+
     while(aux != NULL){
-        printf("\\%s\n",aux->nomeDBF);
+        printf("%s",(*unid)->und);
+        printf("%s\n",aux->nomeDBF);
         aux = aux->prox;
     }
 }
@@ -148,7 +149,7 @@ void ListStructure(Unidade *unid, DBF *dbf){
         printf("Structure for database: %s%s\n",unid->und,dbf->nomeDBF);
         printf("Number of the data records: \n");
         printf("Date of the last update: %s\n",dbf->Data);
-        printf("Field      Field Name      Type      Width      Dec",dbf->Data);
+        printf("Field      Field Name      Type      Width      Dec\n",dbf->Data);
 
         while(campos != NULL){
             printf("%d      %s      %d      %d      %d\n",i++,campos->FieldName,campos->Type,campos->Width,campos->Dec);
