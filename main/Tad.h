@@ -87,9 +87,15 @@ void setDefaltTo(Unidade **unid, char dir[2]) {
 } 
 
 //2
-void Create(Unidade **unid, DBF **dbf, char nome[50],char data[11],char hr[8]) {
+void Create(Unidade **unid, DBF **dbf, char nome[50]) {
     DBF *aux, *atual = NULL;
+    char data[11], hr[9];
 
+    time_t t = time(NULL);
+    struct tm *tm_info = localtime(&t);
+
+    strftime(data, 11, "%d/%m/%Y", tm_info);
+    strftime(hr, 11, "%H:%M:%S", tm_info);
     //Preenche o aux com as informaçoes do novo arquivo .DBF
     aux = (DBF *)malloc(sizeof(DBF));
     strcpy(aux->nomeDBF,nome);
@@ -165,7 +171,6 @@ void Append(DBF **dbf){
     Dados *aux = NULL;
 
     aux = (Dados *)malloc(sizeof(Dados));
-    aux
 
 }
 

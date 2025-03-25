@@ -2,6 +2,7 @@
 #include <string.h>
 #include <conio2.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include "Tad.h"
 
@@ -81,8 +82,8 @@ int main() {
 
     setDefaltTo(&unid, "C:"); 
     
-    Create(&unid,&dbf,"Lucas.dbf","12/01/2025","13:00:00");
-    Create(&unid,&dbf,"Matias.dbf","17/01/2035","11:00:00");
+    Create(&unid,&dbf,"Lucas.dbf");
+    Create(&unid,&dbf,"Matias.dbf");
 
     Dir(&unid);
 
