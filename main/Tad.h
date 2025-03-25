@@ -161,6 +161,14 @@ void ListStructure(Unidade *unid, DBF *dbf){
     
 }
 
+void Append(DBF **dbf){
+    Dados *aux = NULL;
+
+    aux = (Dados *)malloc(sizeof(Dados));
+    aux
+
+}
+
 
 int Menu1(unsigned int op){
     clrscr();

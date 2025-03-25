@@ -79,7 +79,7 @@ int main() {
 
     system("pause");
 
-    setDefaltTo(&unid, "D:"); 
+    setDefaltTo(&unid, "C:"); 
     
     Create(&unid,&dbf,"Lucas.dbf","12/01/2025","13:00:00");
     Create(&unid,&dbf,"Matias.dbf","17/01/2035","11:00:00");
