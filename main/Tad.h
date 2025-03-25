@@ -51,7 +51,7 @@ union dados {
     Dados* prox;
 };
 
-
+//1
 void setDefaltTo(Unidade **unid, char dir[2]) {
     Unidade *C = NULL, *D = NULL;
     
@@ -86,7 +86,8 @@ void setDefaltTo(Unidade **unid, char dir[2]) {
     }
 } 
 
-void criarDBF(Unidade **unid, DBF **dbf, char nome[50],char data[11],char hr[8]) {
+//2
+void Create(Unidade **unid, DBF **dbf, char nome[50],char data[11],char hr[8]) {
     DBF *aux, *atual = NULL;
 
     //Preenche o aux com as informaçoes do novo arquivo .DBF
@@ -118,6 +119,7 @@ void criarDBF(Unidade **unid, DBF **dbf, char nome[50],char data[11],char hr[8])
     aux->prox = NULL;
 }
 
+//3
 void Dir(Unidade **unid){
     DBF *aux;
 
@@ -129,6 +131,7 @@ void Dir(Unidade **unid){
     }
 }
 
+//4
 void quit(){
     gotoxy(30, 15);
     textcolor(LIGHTRED);
@@ -136,6 +139,22 @@ void quit(){
     textcolor(WHITE);
     exit;
 }
+
+//6
+ListStructure(Unidade *unid, DBF *dbf){
+    Campo *campos = dbf->campos;
+    if(unid !=NULL && unid->arqs !=NULL){
+        printf("Structure for database: %s%s\n",unid->und,dbf->nomeDBF);
+        printf("Number of the data records: \n");
+        printf("Date of the last update: %s\n",dbf->Data);
+
+        while(campos != NULL){
+            printf()
+        }
+    }
+    
+}
+
 
 int Menu1(unsigned int op){
     clrscr();

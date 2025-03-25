@@ -5,6 +5,8 @@
 
 #include "Tad.h"
 
+//Funções já feitas: 1,2,3,4
+
 int main() {
     Unidade *unid = NULL;
     DBF *dbf;
