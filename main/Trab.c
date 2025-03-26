@@ -27,6 +27,29 @@ void caixa3();
 void caixa4();
 void instrucoes();
 
+DBF* buscaDBF(char str[], DBF *dbf) {
+    DBF *aux = dbf, *ret = NULL;
+    char flag = 0;
+
+    //Ir para o começo dos DBF
+    while(aux->ant != NULL) {
+        aux = aux->ant;
+    }
+
+    //Procurar o DBF passado
+    if (compare(aux->nomeDBF, str)) {
+        ret = aux;
+    }
+    while(aux->prox != NULL) {
+        if (compare(aux->nomeDBF, str)) {
+            ret = aux;
+        }
+        aux = aux->prox;
+    }
+
+    return ret;
+}
+
 int main() {
     Unidade *unid = NULL;
     DBF *dbf = NULL, *aberto = NULL;
@@ -76,8 +99,9 @@ int main() {
                 //Foi digitado o comando "USE"
                 extrairParametro(comando, param);
 
-                if (buscaDBF(param[1])) { //FAZER FUNÇOES
-                    USE(&aberto);
+                if (buscaDBF(param, dbf) != NULL) {
+                    USE(&aberto, buscaDBF(param, dbf));
+                    //printf("DBF ATUAL: %s\n", aberto->nomeDBF); system("pause");
                 }
             break;
 

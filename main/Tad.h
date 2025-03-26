@@ -153,6 +153,11 @@ void quit(){
     exit;
 }
 
+//5
+void USE(DBF **aberto, DBF *atual) {
+    *aberto = atual;
+}
+
 //6
 void ListStructure(Unidade *unid, DBF *dbf){
     Campo *campos = dbf->campos;
