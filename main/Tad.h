@@ -94,47 +94,53 @@ void Create(Unidade **unid, DBF **dbf, char nome[50]) {
     time_t t = time(NULL);
     struct tm *tm_info = localtime(&t);
 
-    strftime(data, 11, "%d/%m/%Y", tm_info);
-    strftime(hr, 11, "%H:%M:%S", tm_info);
-    //Preenche o aux com as informaçoes do novo arquivo .DBF
-    aux = (DBF *)malloc(sizeof(DBF));
-    strcpy(aux->nomeDBF,nome);
-    strcpy(aux->Data,data);
-    strcpy(aux->Hora,hr);
-    aux->campos = NULL;
-    aux->status = NULL;
+    //Verificar se a unidade existe
+    if (*unid != NULL) {
+        strftime(data, 11, "%d/%m/%Y", tm_info);
+        strftime(hr, 11, "%H:%M:%S", tm_info);
+        //Preenche o aux com as informaçoes do novo arquivo .DBF
+        aux = (DBF *)malloc(sizeof(DBF));
+        strcpy(aux->nomeDBF,nome);
+        strcpy(aux->Data,data);
+        strcpy(aux->Hora,hr);
+        aux->campos = NULL;
+        aux->status = NULL;
 
-    //Se nao existir arquivo .dbf
-    if(*dbf == NULL){
-        *dbf = aux;
-        aux->ant = NULL;
+        //Se nao existir arquivo .dbf
+        if(*dbf == NULL){
+            *dbf = aux;
+            aux->ant = NULL;
 
-        (*unid)->arqs = *dbf;
-    }
-    //Existe arquivos .dbf
-    else{
-        //Aponta o ultimo arquivo .DBF para o novo arquivo(aux)
-        atual = *dbf;
-        while(atual ->prox != NULL){
-            atual = atual->prox;
+            (*unid)->arqs = *dbf;
         }
-        aux->ant = atual;
-        atual->prox = aux;
-        
+        //Existe arquivos .dbf
+        else{
+            //Aponta o ultimo arquivo .DBF para o novo arquivo(aux)
+            atual = *dbf;
+            while(atual ->prox != NULL){
+                atual = atual->prox;
+            }
+            aux->ant = atual;
+            atual->prox = aux;
+            
+        }
+        aux->prox = NULL;
     }
-    aux->prox = NULL;
 }
 
 //3
 void Dir(Unidade **unid){
     DBF *aux;
 
-    aux = (*unid)->arqs;
+    //Verificar se a unidade existe
+    if (*unid != NULL) {
+        aux = (*unid)->arqs;
 
-    while(aux != NULL){
-        printf("%s",(*unid)->und);
-        printf("%s\n",aux->nomeDBF);
-        aux = aux->prox;
+        while(aux != NULL){
+            printf("%s",(*unid)->und);
+            printf("%s\n",aux->nomeDBF);
+            aux = aux->prox;
+        }
     }
 }
 
