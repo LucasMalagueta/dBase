@@ -6,6 +6,89 @@
 
 #include "Tad.h"
 
+//Tratar comando
+char validaComando(char str[]);
+void lerComando(char str[]);
+int chaveComando(char str[]);
+void extrairParametro(char str[], char str2[]) ;
+void extrairParametros(char mat[5][15], char comando[]);
+
+//Funções gerais
+void print2(int x, int y, char str[]);
+char compare(char str[], char str2[]);
+void strSplit(char str[], char str2[], char del);
+
+//Interfaça Gráfica
+void moldura(int xi, int yi, int xf, int yf);
+void linhaVertical(int xi, int yi, int yf);
+void caixa1();
+void caixa2();
+void caixa3(); 
+void caixa4();
+void instrucoes();
+
+int main() {
+    Unidade *unid = NULL;
+    DBF *dbf = NULL;
+
+    char comando[50], cmd[15], param[15];
+    char params[4][15];
+
+    instrucoes();
+
+    do {
+        lerComando(comando);
+        strSplit(comando, cmd, ' ');
+        // gotoxy(1, 1);
+        // printf("String digitada: %s\n", comando);
+        // printf("Comando extraido: %s\n", cmd);
+        // printf("Chave do Comando: %d\n", chaveComando(cmd));
+
+        switch (chaveComando(cmd)) {
+            case 0:
+                //Foi digitado comando que começa com "SET"
+                extrairParametros(params, comando);
+                //"SET DEFAULT ..."
+                if (compare(params[1], "DEFAULT") && compare(params[2], "TO")) {
+                    if (compare(params[3], "C:") || compare(params[3], "D:")) {
+                        setDefaltTo(&unid, params[3]); 
+                    }
+                }
+            break;
+
+            case 1:
+                //Foi digitado comando que começa com "CREATE"
+                extrairParametro(comando, param);
+                //printf("%s\n", param); system("pause");
+                Create(&unid, &dbf, param);       
+            break;
+
+            case 2:
+                //Foi digitado o comando "DIR"
+                Dir(&unid);
+            break;
+
+            case 3:
+                //Foi digitado o comando "QUIT" irá sair do loop do while
+            break;
+
+            case 4:
+                //Foi digitado comando que começa com "LIST"
+                extrairParametros(params, comando);
+                if (compare(params[1], "STRUCTURE")) {
+                    ListStructure(unid, dbf);
+                }
+            break;
+
+            default:
+                printf("Opcao invalida.\n");
+        }
+        
+    } while (chaveComando(cmd) != 3);
+
+    return 0;
+}
+
 void print2(int x, int y, char str[]) {
     gotoxy(x, y);
     printf("%s", str);
@@ -110,33 +193,20 @@ char compare(char str[], char str2[]) {
 }
 
 void moldura(int xi, int yi, int xf, int yf) {
-	//textcolor(BLACK); textbackground(LIGHTGRAY);
-	
-    gotoxy(xi, yi);
-    printf("%c", 201); // Canto superior esquerdo
-    gotoxy(xf, yi);
-    printf("%c", 187); // Canto superior direito
-    gotoxy(xi, yf);
-    printf("%c", 200); // Canto inferior esquerdo
-    gotoxy(xf, yf);
-    printf("%c", 188); // Canto inferior direito
+    gotoxy(xi, yi); printf("%c", 201); // Canto superior esquerdo
+    gotoxy(xf, yi); printf("%c", 187); // Canto superior direito
+    gotoxy(xi, yf); printf("%c", 200); // Canto inferior esquerdo
+    gotoxy(xf, yf); printf("%c", 188); // Canto inferior direito
 
     for (int a = xi + 1; a < xf; a++) {
-        gotoxy(a, yi);
-        printf("%c", 205); // Linha superior
-        gotoxy(a, yf);
-        printf("%c", 205); // Linha inferior
+        gotoxy(a, yi); printf("%c", 205); // Linha superior
+        gotoxy(a, yf); printf("%c", 205); // Linha inferior
     }
 
     for (int b = yi + 1; b < yf; b++) {
-        gotoxy(xi, b);
-        printf("%c", 186); // Linha lateral esquerda
-        gotoxy(xf, b);
-        printf("%c", 186); // Linha lateral direita
+        gotoxy(xi, b); printf("%c", 186); // Linha lateral esquerda
+        gotoxy(xf, b); printf("%c", 186); // Linha lateral direita
     }
-
-	
-    //textcolor(LIGHTGRAY); textbackground(BLACK);
 }
 
 void linhaVertical(int xi, int yi, int yf) {
@@ -180,73 +250,11 @@ void caixa4() {
 }
 
 void instrucoes() {
-   //76 de largura
+    //73 de largura
     //5 de altura
     moldura(5, 2, 78, 7);
     caixa1();
     caixa2();
     caixa3();
     caixa4();    
-}
-
-int main() {
-    Unidade *unid = NULL;
-    DBF *dbf = NULL;
-
-    char comando[50], cmd[15], param[15];
-    char params[4][15];
-
-    instrucoes();
-
-    do {
-        lerComando(comando);
-        strSplit(comando, cmd, ' ');
-        // gotoxy(1, 1);
-        // printf("String digitada: %s\n", comando);
-        // printf("Comando extraido: %s\n", cmd);
-        // printf("Chave do Comando: %d\n", chaveComando(cmd));
-
-        switch (chaveComando(cmd)) {
-            case 0:
-                //Foi digitado comando que começa com "SET"
-                extrairParametros(params, comando);
-                //"SET DEFAULT ..."
-                if (compare(params[1], "DEFAULT") && compare(params[2], "TO")) {
-                    if (compare(params[3], "C:") || compare(params[3], "D:")) {
-                        setDefaltTo(&unid, params[3]); 
-                    }
-                }
-            break;
-
-            case 1:
-                //Foi digitado comando que começa com "CREATE"
-                extrairParametro(comando, param);
-                //printf("%s\n", param); system("pause");
-                Create(&unid, &dbf, param);       
-            break;
-
-            case 2:
-                //Foi digitado o comando "DIR"
-                Dir(&unid);
-            break;
-
-            case 3:
-                //Foi digitado o comando "QUIT" irá sair do loop do while
-            break;
-
-            case 4:
-                //Foi digitado comando que começa com "LIST"
-                extrairParametros(params, comando);
-                if (compare(params[1], "STRUCTURE")) {
-                    ListStructure(unid, dbf);
-                }
-            break;
-
-            default:
-                printf("Opcao invalida.\n");
-        }
-        
-    } while (chaveComando(cmd) != 3);
-
-    return 0;
 }
