@@ -29,7 +29,7 @@ void instrucoes();
 
 int main() {
     Unidade *unid = NULL;
-    DBF *dbf = NULL;
+    DBF *dbf = NULL, *aberto = NULL;
 
     char comando[50], cmd[15], param[15];
     char params[4][15];
@@ -73,6 +73,15 @@ int main() {
             break;
 
             case 4:
+                //Foi digitado o comando "USE"
+                extrairParametro(comando, param);
+
+                if (buscaDBF(param[1])) { //FAZER FUNÇOES
+                    USE(&aberto);
+                }
+            break;
+
+            case 5:
                 //Foi digitado comando que começa com "LIST"
                 extrairParametros(params, comando);
                 if (compare(params[1], "STRUCTURE")) {
