@@ -146,11 +146,7 @@ void Dir(Unidade **unid){
 
 //4
 void quit(){
-    gotoxy(30, 15);
-    textcolor(LIGHTRED);
-    printf("Encerrando o programa...\n");
-    textcolor(WHITE);
-    exit;
+    gotoxy(1, 20);
 }
 
 //5
@@ -177,6 +173,8 @@ void ListStructure(Unidade *unid, DBF *dbf){
     }
     
 }
+
+void insere(char T,Dados **nova);
 
 //7
 void Append(DBF **dbf){
@@ -213,4 +211,31 @@ void Append(DBF **dbf){
     novastatus->prox = NULL;
     novastatus->boolean = 1;
 
+}
+
+void insere(char T,Dados **nova){
+    switch (T){
+    case 'N':
+        scanf("%d", &(*nova)->valorN);
+        break;
+    
+    case 'D':
+        gets((*nova)->valorD);
+        break;
+    
+    case 'L':
+        (*nova)->valorL = getch();
+        break;
+    
+    case 'C':
+        gets((*nova)->valorC);
+        break;
+    
+    case 'M':
+        gets((*nova)->valorM);
+        break;
+    
+    default:
+        break;
+    }
 }

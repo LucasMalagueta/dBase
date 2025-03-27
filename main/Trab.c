@@ -330,30 +330,3 @@ void instrucoes() {
     caixa3();
     caixa4();    
 }
-
-void insere(char T,Dados **nova){
-    switch (T){
-    case 'N':
-        scanf("%d",&(*nova)->valorN);
-        break;
-    
-    case 'D':
-        gets(&(*nova)->valorD);
-        break;
-    
-    case 'L':
-        get(&(*nova)->valorL);
-        break;
-    
-    case 'C':
-        gets(&(*nova)->valorC);
-        break;
-    
-    case 'M':
-        gets(&(*nova)->valorM);
-        break;
-    
-    default:
-        break;
-    }
-}
