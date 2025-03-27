@@ -18,7 +18,7 @@ void print2(int x, int y, char str[]);
 char compare(char str[], char str2[]);
 void strSplit(char str[], char str2[], char del);
 
-//Interfaça Gráfica
+//Interface Gráfica
 void moldura(int xi, int yi, int xf, int yf);
 void linhaVertical(int xi, int yi, int yf);
 void caixa1();
@@ -26,6 +26,10 @@ void caixa2();
 void caixa3(); 
 void caixa4();
 void instrucoes();
+void base();
+void baseDir();
+void baseCmd();
+void baseDBF();
 
 DBF* buscaDBF(char str[], DBF *dbf) {
     DBF *aux = dbf, *ret = NULL;
@@ -54,10 +58,14 @@ int main() {
     Unidade *unid = NULL;
     DBF *dbf = NULL, *aberto = NULL;
 
-    char comando[50], cmd[15], param[15];
-    char params[4][15];
+    char comando[50], cmd[15], arg[15];
+    char args[4][15];
 
+    clrscr();
     instrucoes();
+    base();
+    baseCmd("Command Line");
+    baseDir(" ");
 
     do {
         lerComando(comando);
@@ -70,20 +78,22 @@ int main() {
         switch (chaveComando(cmd)) {
             case 0:
                 //Foi digitado comando que começa com "SET"
-                extrairParametros(params, comando);
+                extrairParametros(args, comando);
                 //"SET DEFAULT ..."
-                if (compare(params[1], "DEFAULT") && compare(params[2], "TO")) {
-                    if (compare(params[3], "C:") || compare(params[3], "D:")) {
-                        setDefaltTo(&unid, params[3]); 
+                if (compare(args[1], "DEFAULT") && compare(args[2], "TO")) {
+                    if (compare(args[3], "C:") || compare(args[3], "D:")) {
+                        setDefaltTo(&unid, args[3]);
+                        baseDir(unid->und);
                     }
                 }
             break;
 
             case 1:
                 //Foi digitado comando que começa com "CREATE"
-                extrairParametro(comando, param);
-                //printf("%s\n", param); system("pause");
-                Create(&unid, &dbf, param);       
+                extrairParametro(comando, arg);
+                strSplit(arg, cmd, '.');
+                Create(&unid, &dbf, arg);
+                baseDBF(arg);
             break;
 
             case 2:
@@ -93,22 +103,23 @@ int main() {
 
             case 3:
                 //Foi digitado o comando "QUIT" irá sair do loop do while
+                quit();
             break;
 
             case 4:
                 //Foi digitado o comando "USE"
-                extrairParametro(comando, param);
+                extrairParametro(comando, arg);
 
-                if (buscaDBF(param, dbf) != NULL) {
-                    USE(&aberto, buscaDBF(param, dbf));
+                if (buscaDBF(arg, dbf) != NULL) {
+                    USE(&aberto, buscaDBF(arg, dbf));
                     //printf("DBF ATUAL: %s\n", aberto->nomeDBF); system("pause");
                 }
             break;
 
             case 5:
                 //Foi digitado comando que começa com "LIST"
-                extrairParametros(params, comando);
-                if (compare(params[1], "STRUCTURE")) {
+                extrairParametros(args, comando);
+                if (compare(args[1], "STRUCTURE")) {
                     ListStructure(unid, dbf);
                 }
             break;
@@ -142,15 +153,43 @@ char validaComando(char str[]) {
     return flag;
 }
 
-void base(void) {
+void base() {
     textcolor(BLACK); textbackground(LIGHTGRAY);
+    //Barra completa
     for (int i = 5; i < 89; i++) {
-        gotoxy(i, 13); printf("%c", 205);
+        gotoxy(i, 13); printf("%c", ' ');
 	}
-    
-    gotoxy(5, 13);
-    clreol();
-    print2(5, 13, "Command Line");
+    textcolor(LIGHTGRAY); textbackground(BLACK);
+}
+
+void baseCmd(char cmd[]) {
+    textcolor(BLACK); textbackground(LIGHTGRAY);
+    for (int i = 0; i < 15; i++) {
+        gotoxy(i + 5, 13); printf("%c", ' ');
+	}
+    //Linha de comando
+    print2(5, 13, cmd);
+    textcolor(LIGHTGRAY); textbackground(BLACK);
+}
+
+void baseDir(char dir[]) {
+    textcolor(BLACK); textbackground(LIGHTGRAY);
+    //Diretório atual
+    gotoxy(21, 13); printf("%c", 186);
+    if (dir != " ") {
+        gotoxy(22, 13); printf("<%s>", dir);
+    }
+    gotoxy(26, 13); printf("%c", 186);
+    textcolor(LIGHTGRAY); textbackground(BLACK);
+}
+
+void baseDBF(char DBF[]) {
+    textcolor(BLACK); textbackground(LIGHTGRAY);
+    for (int i = 0; i < 15; i++) {
+        gotoxy(i + 28, 13); printf("%c", ' ');
+	}
+    //Linha dbf
+    print2(27, 13, DBF);
     textcolor(LIGHTGRAY); textbackground(BLACK);
 }
 
@@ -169,7 +208,6 @@ void lerComando(char str[]) {
     int i;
 
     do {
-        base();
         print2(5, 12, ". ");
 
         strSplit(gets(str), cmd, ' ');
