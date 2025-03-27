@@ -84,6 +84,7 @@ int main() {
                     if (compare(args[3], "C:") || compare(args[3], "D:")) {
                         setDefaltTo(&unid, args[3]);
                         baseDir(unid->und);
+                        baseDBF("");
                     }
                 }
             break;
@@ -112,7 +113,7 @@ int main() {
 
                 if (buscaDBF(arg, dbf) != NULL) {
                     USE(&aberto, buscaDBF(arg, dbf));
-                    //printf("DBF ATUAL: %s\n", aberto->nomeDBF); system("pause");
+                    baseDBF(arg);
                 }
             break;
 
@@ -186,7 +187,7 @@ void baseDir(char dir[]) {
 void baseDBF(char DBF[]) {
     textcolor(BLACK); textbackground(LIGHTGRAY);
     for (int i = 0; i < 15; i++) {
-        gotoxy(i + 28, 13); printf("%c", ' ');
+        gotoxy(i + 27, 13); printf("%c", ' ');
 	}
     //Linha dbf
     print2(27, 13, DBF);
@@ -328,4 +329,31 @@ void instrucoes() {
     caixa2();
     caixa3();
     caixa4();    
+}
+
+void insere(char T,Dados **nova){
+    switch (T){
+    case 'N':
+        scanf("%d",&(*nova)->valorN);
+        break;
+    
+    case 'D':
+        gets(&(*nova)->valorD);
+        break;
+    
+    case 'L':
+        get(&(*nova)->valorL);
+        break;
+    
+    case 'C':
+        gets(&(*nova)->valorC);
+        break;
+    
+    case 'M':
+        gets(&(*nova)->valorM);
+        break;
+    
+    default:
+        break;
+    }
 }

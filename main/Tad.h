@@ -178,31 +178,39 @@ void ListStructure(Unidade *unid, DBF *dbf){
     
 }
 
+//7
 void Append(DBF **dbf){
-    Dados *aux = NULL;
-
-    aux = (Dados *)malloc(sizeof(Dados));
-
-}
-
-
-int Menu1(unsigned int op){
-    clrscr();
-
-    textcolor(LIGHTBLUE);
-    gotoxy(30, 5);  printf("=====================");
-    gotoxy(30, 6);  printf("       MENU         ");
-    gotoxy(30, 7);  printf("=====================");
     
-    textcolor(YELLOW);
-    gotoxy(30, 9);  printf("1 - Opcao 1");
-    gotoxy(30, 10); printf("2 - Opcao 2");
-    gotoxy(30, 11); printf("0 - QUIT (Sair)");
-    
-    textcolor(WHITE);
-    gotoxy(30, 13);
-    printf("Escolha uma opcao: ");
-    scanf("%d",&op);
+    Campo *aux = (*dbf)->campos;
+    Status *status = (*dbf)->status,*novastatus = NULL;
+    Dados *dados = NULL, *nova = NULL;
 
-    return op;
+    nova = (Dados *)malloc(sizeof(Dados));
+    novastatus = (Status *)malloc(sizeof(Status));
+
+    //Printa os Campos que existem no arq
+    while(aux != NULL){
+        printf("%s:\n",aux->FieldName);
+        aux = aux->prox;
+    }
+    aux = (*dbf)->campos;
+
+    while(aux != NULL){
+
+        dados = aux->Pdados;
+        while(dados->prox != NULL){
+            dados = dados->prox;
+            status = status->prox;
+        }
+        dados->prox = nova;
+        nova->prox = NULL;
+        insere(aux->Type,&nova);
+
+        aux = aux->prox;
+    }
+    //preenche e liga a nova caixa status
+    status->prox = novastatus;
+    novastatus->prox = NULL;
+    novastatus->boolean = 1;
+
 }
