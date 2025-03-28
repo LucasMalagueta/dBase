@@ -89,7 +89,8 @@ void setDefaltTo(Unidade **unid, char dir[2]) {
 //2
 void Create(Unidade **unid, DBF **dbf, char nome[50]) {
     DBF *aux, *atual = NULL;
-    char data[11], hr[9];
+    char data[11], hr[9], op;
+    int count = 1;
 
     time_t t = time(NULL);
     struct tm *tm_info = localtime(&t);
@@ -125,6 +126,14 @@ void Create(Unidade **unid, DBF **dbf, char nome[50]) {
             
         }
         aux->prox = NULL;
+
+        //Iniciar loop campos
+        do {
+            gotoxy(7, 10);
+            printf("%d  ", count);
+
+            op = getch();
+        } while (op != 27);
     }
 }
 

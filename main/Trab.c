@@ -30,6 +30,7 @@ void base();
 void baseDir();
 void baseCmd();
 void baseDBF();
+void createCampos();
 
 DBF* buscaDBF(char str[], DBF *dbf) {
     DBF *aux = dbf, *ret = NULL;
@@ -93,8 +94,10 @@ int main() {
                 //Foi digitado comando que começa com "CREATE"
                 extrairParametro(comando, arg);
                 strSplit(arg, cmd, '.');
+                baseDBF(cmd);
+                baseCmd("CREATE");
+                createCampos();
                 Create(&unid, &dbf, arg);
-                baseDBF(arg);
             break;
 
             case 2:
@@ -158,7 +161,7 @@ void base() {
     textcolor(BLACK); textbackground(LIGHTGRAY);
     //Barra completa
     for (int i = 5; i < 89; i++) {
-        gotoxy(i, 13); printf("%c", ' ');
+        gotoxy(i, 19); printf("%c", ' ');
 	}
     textcolor(LIGHTGRAY); textbackground(BLACK);
 }
@@ -166,31 +169,31 @@ void base() {
 void baseCmd(char cmd[]) {
     textcolor(BLACK); textbackground(LIGHTGRAY);
     for (int i = 0; i < 15; i++) {
-        gotoxy(i + 5, 13); printf("%c", ' ');
+        gotoxy(i + 5, 19); printf("%c", ' ');
 	}
     //Linha de comando
-    print2(5, 13, cmd);
+    print2(5, 19, cmd);
     textcolor(LIGHTGRAY); textbackground(BLACK);
 }
 
 void baseDir(char dir[]) {
     textcolor(BLACK); textbackground(LIGHTGRAY);
     //Diretório atual
-    gotoxy(21, 13); printf("%c", 186);
+    gotoxy(21, 19); printf("%c", 186);
     if (dir != " ") {
-        gotoxy(22, 13); printf("<%s>", dir);
+        gotoxy(22, 19); printf("<%s>", dir);
     }
-    gotoxy(26, 13); printf("%c", 186);
+    gotoxy(26, 19); printf("%c", 186);
     textcolor(LIGHTGRAY); textbackground(BLACK);
 }
 
 void baseDBF(char DBF[]) {
     textcolor(BLACK); textbackground(LIGHTGRAY);
     for (int i = 0; i < 15; i++) {
-        gotoxy(i + 27, 13); printf("%c", ' ');
+        gotoxy(i + 27, 19); printf("%c", ' ');
 	}
     //Linha dbf
-    print2(27, 13, DBF);
+    print2(27, 19, DBF);
     textcolor(LIGHTGRAY); textbackground(BLACK);
 }
 
@@ -209,11 +212,11 @@ void lerComando(char str[]) {
     int i;
 
     do {
-        print2(5, 12, ". ");
+        print2(5, 18, ". ");
 
         strSplit(gets(str), cmd, ' ');
 
-        gotoxy(5, 12);
+        gotoxy(5, 18);
         clreol();
     } while (!validaComando(cmd));
 }
@@ -233,6 +236,7 @@ int chaveComando(char str[]) {
     return flag;
 }
 
+//Retorna tudo depois do primeiro espaço
 void extrairParametro(char str[], char str2[]) {
     int i = 0, j;
     while (str[i] != ' ') {
@@ -329,4 +333,12 @@ void instrucoes() {
     caixa2();
     caixa3();
     caixa4();    
+}
+
+void createCampos() {
+    print2(10, 8, "Field Name  Type      Width  Dec");
+    gotoxy(10, 9);
+    for (int i = 0; i < 32; i++) {
+        printf("%c", 205);
+    }
 }
