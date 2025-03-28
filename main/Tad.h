@@ -56,7 +56,7 @@ void exibelinhacampo();
 void printCH(char ch);
 
 //1
-void setDefaltTo(Unidade **unid, char dir[2]) {
+void setDefaltTo(Unidade **unid, char dir[3]) {
     Unidade *C = NULL, *D = NULL;
     
     //Diretorios C e D nao existem
@@ -85,13 +85,18 @@ void setDefaltTo(Unidade **unid, char dir[2]) {
         //Unidade atual diferente da solicitada
         if (strcmp((*unid)->und, dir) != 0) {
             //Aponta para a outra unidade
-            *unid = ((*unid)->bottom != NULL) ? (*unid)->bottom : (*unid)->top;
+            if((*unid)->bottom != NULL){
+                (*unid) = (*unid)->bottom;
+            }else{
+                (*unid) = (*unid)->top;
+            }
+            //*unid = ((*unid)->bottom != NULL) ? (*unid)->bottom : (*unid)->top;
         }
     }
 } 
 
 //2
-void Create(Unidade **unid, DBF **dbf, char nome[50]) {
+void Create(Unidade **unid, DBF **dbf, char nome[50]){
     DBF *aux, *atual = NULL;
     char data[11], hr[9], op, ch;
     int x = 7, y = 10, count = 0;
@@ -228,15 +233,15 @@ void exibelinhacampo(int *x, int *y, int *count) {
 }
 
 //3
-void Dir(Unidade **unid){
+void Dir(Unidade *unid){
     DBF *aux;
 
     //Verificar se a unidade existe
-    if (*unid != NULL) {
-        aux = (*unid)->arqs;
+    if (unid->arqs != NULL) {
+        aux = unid->arqs;
 
         while(aux != NULL){
-            printf("%s",(*unid)->und);
+            printf("%s",unid->und);
             printf("%s\n",aux->nomeDBF);
             aux = aux->prox;
         }

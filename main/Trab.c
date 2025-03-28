@@ -113,7 +113,7 @@ int main() {
 
             case 2:
                 //Foi digitado o comando "DIR"
-                Dir(&unid);
+                Dir(unid);
             break;
 
             case 3:
