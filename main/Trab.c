@@ -18,6 +18,8 @@ void strSplit(char str[], char str2[], char del);
 
 //Interface Gráfica
 void moldura(int xi, int yi, int xf, int yf);
+void limparLinha(int xi, int xf, int y);
+void limparArea(int xi, int yi, int xf, int yf);
 void linhaVertical(int xi, int yi, int yf);
 void caixa1();
 void caixa2();
@@ -70,11 +72,11 @@ int main() {
     textcolor(WHITE);
     instrucoes();
     base();
-    baseCmd("Command Line");
     baseDir(" ");
     baseField(" ");
 
     do {
+        baseCmd("Command Line");
         lerComando(comando);
         strSplit(comando, cmd, ' ');
         // gotoxy(1, 1);
@@ -104,6 +106,7 @@ int main() {
                 baseCmd("CREATE");
                 createCampos();
                 Create(&unid, &dbf, arg);
+                limparArea(5, 8, 87, 19);
             break;
 
             case 2:
@@ -135,7 +138,7 @@ int main() {
             break;
 
             default:
-                printf("Opcao invalida.\n");
+                print2(7, 19, "Opcao invalida.\n");
         }
         
     } while (chaveComando(cmd) != 3);
@@ -166,9 +169,8 @@ char validaComando(char str[]) {
 void base() {
     textcolor(BLACK); textbackground(LIGHTGRAY);
     //Barra completa
-    for (int i = 5; i < 87; i++) {
-        gotoxy(i, 20); printf("%c", ' ');
-	}
+    limparLinha(5, 87, 20);
+    //Separadores
     gotoxy(21, 20); printf("%c", 186);
     gotoxy(26, 20); printf("%c", 186);
     gotoxy(51, 20); printf("%c", 186);
@@ -180,9 +182,7 @@ void base() {
 
 void baseCmd(char cmd[]) {
     textcolor(BLACK); textbackground(LIGHTGRAY);
-    for (int i = 0; i < 15; i++) {
-        gotoxy(i + 5, 20); printf("%c", ' ');
-	}
+    limparLinha(5, 20, 20);
     //Linha de comando
     print2(5, 20, cmd);
     textcolor(LIGHTGRAY); textbackground(BLACK);
@@ -200,9 +200,7 @@ void baseDir(char dir[]) {
 
 void baseDBF(char DBF[]) {
     textcolor(BLACK); textbackground(LIGHTGRAY);
-    for (int i = 0; i < 15; i++) {
-        gotoxy(i + 27, 20); printf("%c", ' ');
-	}
+    limparLinha(27, 42, 20);
     //Linha dbf
     print2(27, 20, DBF);
     textcolor(LIGHTGRAY); textbackground(BLACK);
@@ -210,9 +208,7 @@ void baseDBF(char DBF[]) {
 
 void baseField(char field[]) {
     textcolor(BLACK); textbackground(LIGHTGRAY);
-    for (int i = 0; i < 15; i++) {
-        gotoxy(i + 52, 20); printf("%c", ' ');
-	}
+    limparLinha(52, 67, 20);
     //Linha dbf
     print2(52, 20, "Field: ");
     textcolor(LIGHTGRAY); textbackground(BLACK);
@@ -239,9 +235,7 @@ void lerComando(char str[]) {
 
         gotoxy(5, 19);
         //Linha de comando
-        for (int i = 8; i < 87; i++) {
-            printf("%c", ' ');
-        }
+        limparLinha(7, 87, 19);
     } while (!validaComando(cmd));
 }
 
@@ -374,4 +368,19 @@ void createCampos2() {
         printf("%c", 205);
     }
     print2(52, 10, "1");
+}
+
+void limparLinha(int xi, int xf, int y) {
+    for (; xi < xf; xi++) {
+        gotoxy(xi, y); printf("%c", ' ');
+	}
+}
+
+void limparArea(int xi, int yi, int xf, int yf) {
+    for (; yi < yf; yi++) {
+        gotoxy(xi, yi);
+        for (int i = xi; i < xf; i++) {
+            printf("%c", ' ');
+        }
+    }
 }

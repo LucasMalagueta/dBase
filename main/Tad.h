@@ -34,7 +34,7 @@ struct status {
 struct campo {
     Dados* Patual;
     char FieldName[50];
-    char Type[15]; // 'N' = Número, 'D' = Data, 'L' = Lógico, 'C' = Caracter, 'M' = Memo
+    char Type; // 'N' = Número, 'D' = Data, 'L' = Lógico, 'C' = Caracter, 'M' = Memo
     int Width;
     int Dec;
     Dados* Pdados;
@@ -53,6 +53,7 @@ union dados {
 
 void cadastraCampo(Campo **campo,int *x,int *y);
 void exibelinhacampo();
+void printCH(char ch);
 
 //1
 void setDefaltTo(Unidade **unid, char dir[2]) {
@@ -92,13 +93,14 @@ void setDefaltTo(Unidade **unid, char dir[2]) {
 //2
 void Create(Unidade **unid, DBF **dbf, char nome[50]) {
     DBF *aux, *atual = NULL;
-    char data[11], hr[9], op;
+    char data[11], hr[9], op, ch;
 
     time_t t = time(NULL);
     struct tm *tm_info = localtime(&t);
 
     //Verificar se a unidade existe
     if (*unid != NULL) {
+        //Criar DBF
         strftime(data, 11, "%d/%m/%Y", tm_info);
         strftime(hr, 11, "%H:%M:%S", tm_info);
         //Preenche o aux com as informaçoes do novo arquivo .DBF
@@ -129,11 +131,10 @@ void Create(Unidade **unid, DBF **dbf, char nome[50]) {
         }
         aux->prox = NULL;
 
+        //Criar campos
         Campo *novo = NULL;
         novo = (Campo*)malloc(sizeof(Campo));
         aux->campos = novo;
-
-        //Iniciar loop campos
 
         int x = 7, y = 10, count = 0;
         exibelinhacampo(&x,&y,&count);
@@ -144,7 +145,9 @@ void Create(Unidade **unid, DBF **dbf, char nome[50]) {
         scanf("%s",novo->FieldName);
 
         gotoxy(x+15, y);
-        scanf("%s",novo->Type);
+        ch = getch();
+        novo->Type = ch;
+        printCH(ch);
 
         gotoxy(x+26, y);
         scanf("%d",&novo->Width);
@@ -158,6 +161,8 @@ void Create(Unidade **unid, DBF **dbf, char nome[50]) {
 
         gotoxy(x+3,y);
         op = getch();
+        fflush(stdin);
+        //Iniciar loop campos
         while (op != 27) {
             //lOGICA DE CADASTRAR CAMPOS
             y++;
@@ -168,6 +173,7 @@ void Create(Unidade **unid, DBF **dbf, char nome[50]) {
 
             gotoxy(x+3,y);
             op = getch();
+            fflush(stdin);
         }
         textcolor(LIGHTGRAY);
         textbackground(BLACK);
@@ -176,6 +182,7 @@ void Create(Unidade **unid, DBF **dbf, char nome[50]) {
 
 void cadastraCampo(Campo **campo, int *x, int *y) {
     Campo *aux = *campo;  // Cria um ponteiro auxiliar para percorrer a lista
+    char ch;
 
     while (aux->prox != NULL) {
         aux = aux->prox;
@@ -189,7 +196,9 @@ void cadastraCampo(Campo **campo, int *x, int *y) {
     scanf("%s", novo->FieldName);
 
     gotoxy(*x + 15, *y);
-    scanf("%s", novo->Type);
+    ch = getch();
+    novo->Type = ch;
+    printCH(ch);
 
     gotoxy(*x + 26, *y);
     scanf("%d", &novo->Width);
@@ -200,6 +209,20 @@ void cadastraCampo(Campo **campo, int *x, int *y) {
     novo->prox = NULL;
     novo->Patual = NULL;
     novo->Pdados = NULL;
+}
+
+void printCH(char ch) {
+    if (ch == 'N') {
+        printf("Numeric");
+    } else if (ch == 'D') {
+        printf("Date");
+    } else if (ch == 'L') {
+        printf("Logical");
+    } else if (ch == 'C') {
+        printf("Character");
+    } else if (ch == 'M') {
+        printf("Memo");
+    }
 }
 
 void exibelinhacampo(int *x,int *y,int *count){
