@@ -128,12 +128,24 @@ void Create(Unidade **unid, DBF **dbf, char nome[50]) {
         aux->prox = NULL;
 
         //Iniciar loop campos
-        do {
-            gotoxy(7, 10);
-            printf("%d  ", count);
+        gotoxy(7, 10);
+        printf("%d  ", count);
+
+        textbackground(LIGHTGRAY); textcolor(BLACK);
+        printf("          ");
+        print2(22, 10, "         ");
+        print2(33, 10, "   ");
+        print2(38, 10, "   ");
+        gotoxy(10, 10);
+        textbackground(BLACK); textcolor(LIGHTGRAY);
+
+        op = getch();
+        while (op != 27) {
+            //lOGICA DE CADASTRAR CAMPOS
+            
 
             op = getch();
-        } while (op != 27);
+        }
     }
 }
 

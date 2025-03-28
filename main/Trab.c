@@ -4,8 +4,6 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include "Tad.h"
-
 //Tratar comando
 char validaComando(char str[]);
 void lerComando(char str[]);
@@ -27,10 +25,14 @@ void caixa3();
 void caixa4();
 void instrucoes();
 void base();
-void baseDir();
-void baseCmd();
-void baseDBF();
+void baseDir(char*);
+void baseCmd(char*);
+void baseDBF(char*);
+void baseField(char*);
 void createCampos();
+void createCampos2();
+
+#include "Tad.h"
 
 DBF* buscaDBF(char str[], DBF *dbf) {
     DBF *aux = dbf, *ret = NULL;
@@ -63,10 +65,14 @@ int main() {
     char args[4][15];
 
     clrscr();
+    textcolor(CYAN);
+    moldura(3, 1, 88, 23);
+    textcolor(WHITE);
     instrucoes();
     base();
     baseCmd("Command Line");
     baseDir(" ");
+    baseField(" ");
 
     do {
         lerComando(comando);
@@ -160,40 +166,55 @@ char validaComando(char str[]) {
 void base() {
     textcolor(BLACK); textbackground(LIGHTGRAY);
     //Barra completa
-    for (int i = 5; i < 89; i++) {
-        gotoxy(i, 19); printf("%c", ' ');
+    for (int i = 5; i < 87; i++) {
+        gotoxy(i, 20); printf("%c", ' ');
 	}
+    gotoxy(21, 20); printf("%c", 186);
+    gotoxy(26, 20); printf("%c", 186);
+    gotoxy(51, 20); printf("%c", 186);
+    gotoxy(71, 20); printf("%c", 186);
+    gotoxy(78, 20); printf("%c", 186);
+
     textcolor(LIGHTGRAY); textbackground(BLACK);
 }
 
 void baseCmd(char cmd[]) {
     textcolor(BLACK); textbackground(LIGHTGRAY);
     for (int i = 0; i < 15; i++) {
-        gotoxy(i + 5, 19); printf("%c", ' ');
+        gotoxy(i + 5, 20); printf("%c", ' ');
 	}
     //Linha de comando
-    print2(5, 19, cmd);
+    print2(5, 20, cmd);
     textcolor(LIGHTGRAY); textbackground(BLACK);
 }
 
 void baseDir(char dir[]) {
     textcolor(BLACK); textbackground(LIGHTGRAY);
     //Diretório atual
-    gotoxy(21, 19); printf("%c", 186);
     if (dir != " ") {
-        gotoxy(22, 19); printf("<%s>", dir);
+        gotoxy(22, 20); printf("<%s>", dir);
     }
-    gotoxy(26, 19); printf("%c", 186);
+
     textcolor(LIGHTGRAY); textbackground(BLACK);
 }
 
 void baseDBF(char DBF[]) {
     textcolor(BLACK); textbackground(LIGHTGRAY);
     for (int i = 0; i < 15; i++) {
-        gotoxy(i + 27, 19); printf("%c", ' ');
+        gotoxy(i + 27, 20); printf("%c", ' ');
 	}
     //Linha dbf
-    print2(27, 19, DBF);
+    print2(27, 20, DBF);
+    textcolor(LIGHTGRAY); textbackground(BLACK);
+}
+
+void baseField(char field[]) {
+    textcolor(BLACK); textbackground(LIGHTGRAY);
+    for (int i = 0; i < 15; i++) {
+        gotoxy(i + 52, 20); printf("%c", ' ');
+	}
+    //Linha dbf
+    print2(52, 20, "Field: ");
     textcolor(LIGHTGRAY); textbackground(BLACK);
 }
 
@@ -212,12 +233,15 @@ void lerComando(char str[]) {
     int i;
 
     do {
-        print2(5, 18, ". ");
+        print2(5, 19, ". ");
 
         strSplit(gets(str), cmd, ' ');
 
-        gotoxy(5, 18);
-        clreol();
+        gotoxy(5, 19);
+        //Linha de comando
+        for (int i = 8; i < 87; i++) {
+            printf("%c", ' ');
+        }
     } while (!validaComando(cmd));
 }
 
@@ -303,32 +327,32 @@ void caixa1() {
 }
 
 void caixa2() {
-    print2(30, 3, "INSERT");
-    print2(26, 4, "Char:   Ins");
-    print2(26, 5, "Field:  ^N");
-    print2(26, 6, "Help:   F1");
-    linhaVertical(39, 2, 7);
+    print2(28, 3, "INSERT");
+    print2(26, 4, "Char:  Ins");
+    print2(26, 5, "Field: ^N");
+    print2(26, 6, "Help:  F1");
+    linhaVertical(38, 2, 7);
 }
 
 void caixa3() {
-    print2(45, 3, "DELETE");
-    print2(42, 4, "Char:    Del");
-    print2(42, 5, "Word:   ^Y");
-    print2(42, 6, "Field:  ^U");
-    linhaVertical(55, 2, 7);
+    print2(44, 3, "DELETE");
+    print2(41, 4, "Char:   Del");
+    print2(41, 5, "Word:  ^Y");
+    print2(41, 6, "Field: ^U");
+    linhaVertical(53, 2, 7);
 }
 
 void caixa4() {
-    print2(58, 3, "Up a field:    /\\");
-    print2(58, 4, "Down a field:  \\/");
-    print2(58, 5, "Exit/Save:    ^End");
-    print2(58, 6, "Abort:        Esc");
+    print2(56, 3, "Up a field:    /\\");
+    print2(56, 4, "Down a field:  \\/");
+    print2(56, 5, "Exit/Save:    ^End");
+    print2(56, 6, "Abort:         Esc");
 }
 
 void instrucoes() {
-    //73 de largura
+    //71 de largura
     //5 de altura
-    moldura(5, 2, 78, 7);
+    moldura(5, 2, 76, 7);
     caixa1();
     caixa2();
     caixa3();
@@ -336,9 +360,18 @@ void instrucoes() {
 }
 
 void createCampos() {
-    print2(10, 8, "Field Name  Type      Width  Dec");
+    print2(10, 8, "Field Name  Type     Width  Dec");
     gotoxy(10, 9);
-    for (int i = 0; i < 32; i++) {
+    for (int i = 0; i < 31; i++) {
         printf("%c", 205);
     }
+}
+
+void createCampos2() {
+    print2(55, 8, "Field Name  Type     Width  Dec");
+    gotoxy(55, 9);
+    for (int i = 0; i < 31; i++) {
+        printf("%c", 205);
+    }
+    print2(52, 10, "1");
 }
