@@ -1,8 +1,9 @@
 #include <stdio.h>
-#include <string.h>
-#include <conio2.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
+#include <ctype.h>
+#include <conio2.h>
 
 //Tratar comando
 char validaComando(char str[]);
@@ -33,6 +34,8 @@ void baseDBF(char*);
 void baseField(char*);
 void createCampos();
 void createCampos2();
+void dica1(int x, char str[]);
+void dica2(int x, char str[]);
 
 #include "Tad.h"
 
@@ -104,7 +107,6 @@ int main() {
                 strSplit(arg, cmd, '.');
                 baseDBF(cmd);
                 baseCmd("CREATE");
-                createCampos();
                 Create(&unid, &dbf, arg);
                 limparArea(5, 8, 87, 19);
             break;
@@ -382,5 +384,21 @@ void limparArea(int xi, int yi, int xf, int yf) {
         for (int i = xi; i < xf; i++) {
             printf("%c", ' ');
         }
+    }
+}
+
+void dica1(int x, char str[]) {
+    textbackground(BLACK); textcolor(LIGHTGRAY);
+    limparLinha(5, 87, 21);
+    if (x > 0) {
+        print2(x, 21, str);
+    }
+}
+
+void dica2(int x, char str[]) {
+    textbackground(BLACK); textcolor(LIGHTGRAY);
+    limparLinha(5, 87, 22);
+    if (x > 0) {
+        print2(x, 22, str);
     }
 }

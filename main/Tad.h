@@ -51,7 +51,7 @@ union dados {
     Dados* prox;
 };
 
-void cadastraCampo(Campo **campo,int *x,int *y);
+void cadastraCampo(DBF **dbf, int *x, int *y);
 void exibelinhacampo();
 void printCH(char ch);
 
@@ -94,6 +94,7 @@ void setDefaltTo(Unidade **unid, char dir[2]) {
 void Create(Unidade **unid, DBF **dbf, char nome[50]) {
     DBF *aux, *atual = NULL;
     char data[11], hr[9], op, ch;
+    int x = 7, y = 10, count = 0;
 
     time_t t = time(NULL);
     struct tm *tm_info = localtime(&t);
@@ -132,83 +133,70 @@ void Create(Unidade **unid, DBF **dbf, char nome[50]) {
         aux->prox = NULL;
 
         //Criar campos
-        Campo *novo = NULL;
-        novo = (Campo*)malloc(sizeof(Campo));
-        aux->campos = novo;
+        dica1(25, "[ENTER] Criar Campo. [Esc] encerrar CREATE");
+        gotoxy(7, 19);
+        op = getch();
+        createCampos();
+        fflush(stdin);
+        //Iniciar loop campos
+        textcolor(BLACK); textbackground(LIGHTGRAY);
+        while (op != 27) {
+            dica1(0, " ");
+            //lOGICA DE CADASTRAR CAMPOS
+            exibelinhacampo(&x, &y, &count);
+            cadastraCampo(&aux, &x, &y);
+            y++;
 
-        int x = 7, y = 10, count = 0;
-        exibelinhacampo(&x,&y,&count);
+            dica1(25, "[ENTER] Criar Campo. [Esc] encerrar CREATE");
+            gotoxy(7, 19);
+            op = getch();
+            fflush(stdin);
+        }
+        textcolor(LIGHTGRAY); textbackground(BLACK);
+    }
+}
 
-        textbackground(LIGHTGRAY); textcolor(BLACK);
+void cadastraCampo(DBF **dbf, int *x, int *y) {
+    Campo *atual = NULL, *novo = NULL; // Cria um ponteiro auxiliar para percorrer a lista
+    char ch;
 
-        gotoxy(x+3, y);
-        scanf("%s",novo->FieldName);
+    //Checar se o DBF existe
+    if (dbf != NULL) {
+        novo = (Campo *)malloc(sizeof(Campo));
+        gotoxy(*x + 3, *y);
+        scanf("%s", novo->FieldName);
 
-        gotoxy(x+15, y);
-        ch = getch();
+        gotoxy(*x + 15, *y);
+        ch = toupper(getch());
         novo->Type = ch;
         printCH(ch);
 
-        gotoxy(x+26, y);
-        scanf("%d",&novo->Width);
+        gotoxy(*x + 26, *y);
+        scanf("%d", &novo->Width);
 
-        gotoxy(x+31, y);
-        scanf("%d",&novo->Dec);
+        gotoxy(*x + 31, *y);
+        scanf("%d", &novo->Dec);
 
         novo->prox = NULL;
         novo->Patual = NULL;
         novo->Pdados = NULL;
 
-        gotoxy(x+3,y);
-        op = getch();
-        fflush(stdin);
-        //Iniciar loop campos
-        while (op != 27) {
-            //lOGICA DE CADASTRAR CAMPOS
-            y++;
-            exibelinhacampo(&x,&y,&count);
 
-            textbackground(LIGHTGRAY); textcolor(BLACK);
-            cadastraCampo(&aux->campos,&x,&y);
-
-            gotoxy(x+3,y);
-            op = getch();
-            fflush(stdin);
+        atual = (*dbf)->campos;
+        //Checar se o DBF tem campos cadastrados. Caso sim atual != NULL
+        if (atual != NULL) { 
+            //Caso exista campos ir até o ultimo
+            while (atual->prox != NULL) {
+                atual = atual->prox;
+            }
+            atual->prox = novo;
+        } 
+        //Caso DBF não ter nenhum campo, novo será o primeiro
+        else {
+            (*dbf)->campos = novo;
         }
-        textcolor(LIGHTGRAY);
-        textbackground(BLACK);
-    }
-}
-
-void cadastraCampo(Campo **campo, int *x, int *y) {
-    Campo *aux = *campo;  // Cria um ponteiro auxiliar para percorrer a lista
-    char ch;
-
-    while (aux->prox != NULL) {
-        aux = aux->prox;
     }
 
-    Campo *novo = (Campo *)malloc(sizeof(Campo));
-
-    aux->prox = novo;
-
-    gotoxy(*x + 3, *y);
-    scanf("%s", novo->FieldName);
-
-    gotoxy(*x + 15, *y);
-    ch = getch();
-    novo->Type = ch;
-    printCH(ch);
-
-    gotoxy(*x + 26, *y);
-    scanf("%d", &novo->Width);
-
-    gotoxy(*x + 31, *y);
-    scanf("%d", &novo->Dec);
-
-    novo->prox = NULL;
-    novo->Patual = NULL;
-    novo->Pdados = NULL;
 }
 
 void printCH(char ch) {
@@ -225,20 +213,18 @@ void printCH(char ch) {
     }
 }
 
-void exibelinhacampo(int *x,int *y,int *count){
-
+void exibelinhacampo(int *x, int *y, int *count) {
     gotoxy(*x, *y);
-    textbackground(BLACK); textcolor(LIGHTGRAY);
+    //Exibir numero do campo
+    textcolor(LIGHTGRAY); textbackground(BLACK); 
     printf("%d  ", ++(*count));
-  
-    textbackground(LIGHTGRAY); textcolor(BLACK);
+    textcolor(BLACK); textbackground(LIGHTGRAY);
+    //Exibir barras de preenchimento
     printf("          ");
     print2(*x+15, *y, "         ");
     print2(*x+26, *y, "   ");
     print2(*x+31, *y, "   ");
     gotoxy(*x+3, *y);
-    textbackground(BLACK); textcolor(LIGHTGRAY);
-
 }
 
 //3
