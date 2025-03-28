@@ -34,7 +34,7 @@ struct status {
 struct campo {
     Dados* Patual;
     char FieldName[50];
-    char Type; // 'N' = Número, 'D' = Data, 'L' = Lógico, 'C' = Caracter, 'M' = Memo
+    char Type[15]; // 'N' = Número, 'D' = Data, 'L' = Lógico, 'C' = Caracter, 'M' = Memo
     int Width;
     int Dec;
     Dados* Pdados;
@@ -50,6 +50,9 @@ union dados {
     char valorM[50];
     Dados* prox;
 };
+
+void cadastraCampo(Campo **campo,int *x,int *y);
+void exibelinhacampo();
 
 //1
 void setDefaltTo(Unidade **unid, char dir[2]) {
@@ -90,7 +93,6 @@ void setDefaltTo(Unidade **unid, char dir[2]) {
 void Create(Unidade **unid, DBF **dbf, char nome[50]) {
     DBF *aux, *atual = NULL;
     char data[11], hr[9], op;
-    int count = 1;
 
     time_t t = time(NULL);
     struct tm *tm_info = localtime(&t);
@@ -127,26 +129,93 @@ void Create(Unidade **unid, DBF **dbf, char nome[50]) {
         }
         aux->prox = NULL;
 
+        Campo *novo = NULL;
+        novo = (Campo*)malloc(sizeof(Campo));
+        aux->campos = novo;
+
         //Iniciar loop campos
-        gotoxy(7, 10);
-        printf("%d  ", count);
+
+        int x = 7, y = 10, count = 0;
+        exibelinhacampo(&x,&y,&count);
 
         textbackground(LIGHTGRAY); textcolor(BLACK);
-        printf("          ");
-        print2(22, 10, "         ");
-        print2(33, 10, "   ");
-        print2(38, 10, "   ");
-        gotoxy(10, 10);
-        textbackground(BLACK); textcolor(LIGHTGRAY);
 
+        gotoxy(x+3, y);
+        scanf("%s",novo->FieldName);
+
+        gotoxy(x+15, y);
+        scanf("%s",novo->Type);
+
+        gotoxy(x+26, y);
+        scanf("%d",&novo->Width);
+
+        gotoxy(x+31, y);
+        scanf("%d",&novo->Dec);
+
+        novo->prox = NULL;
+        novo->Patual = NULL;
+        novo->Pdados = NULL;
+
+        gotoxy(x+3,y);
         op = getch();
         while (op != 27) {
             //lOGICA DE CADASTRAR CAMPOS
-            
+            y++;
+            exibelinhacampo(&x,&y,&count);
 
+            textbackground(LIGHTGRAY); textcolor(BLACK);
+            cadastraCampo(&aux->campos,&x,&y);
+
+            gotoxy(x+3,y);
             op = getch();
         }
+        textcolor(LIGHTGRAY);
+        textbackground(BLACK);
     }
+}
+
+void cadastraCampo(Campo **campo, int *x, int *y) {
+    Campo *aux = *campo;  // Cria um ponteiro auxiliar para percorrer a lista
+
+    while (aux->prox != NULL) {
+        aux = aux->prox;
+    }
+
+    Campo *novo = (Campo *)malloc(sizeof(Campo));
+
+    aux->prox = novo;
+
+    gotoxy(*x + 3, *y);
+    scanf("%s", novo->FieldName);
+
+    gotoxy(*x + 15, *y);
+    scanf("%s", novo->Type);
+
+    gotoxy(*x + 26, *y);
+    scanf("%d", &novo->Width);
+
+    gotoxy(*x + 31, *y);
+    scanf("%d", &novo->Dec);
+
+    novo->prox = NULL;
+    novo->Patual = NULL;
+    novo->Pdados = NULL;
+}
+
+void exibelinhacampo(int *x,int *y,int *count){
+
+    gotoxy(*x, *y);
+    textbackground(BLACK); textcolor(LIGHTGRAY);
+    printf("%d  ", ++(*count));
+  
+    textbackground(LIGHTGRAY); textcolor(BLACK);
+    printf("          ");
+    print2(*x+15, *y, "         ");
+    print2(*x+26, *y, "   ");
+    print2(*x+31, *y, "   ");
+    gotoxy(*x+3, *y);
+    textbackground(BLACK); textcolor(LIGHTGRAY);
+
 }
 
 //3
@@ -186,7 +255,7 @@ void ListStructure(Unidade *unid, DBF *dbf){
         printf("Field      Field Name      Type      Width      Dec\n",dbf->Data);
 
         while(campos != NULL){
-            printf("%d      %s      %d      %d      %d\n",i++,campos->FieldName,campos->Type,campos->Width,campos->Dec);
+            printf("%d      %s      %s      %d      %d\n",i++,campos->FieldName,campos->Type,campos->Width,campos->Dec);
             campos = campos->prox;
         }
     }else{
@@ -234,6 +303,7 @@ void Append(DBF **dbf){
 
 }
 
+//MUDAR, POIS O TYPE DA STRUCT CAMPO NÃO É MAIS CHAR E SIM STRING!
 void insere(char T,Dados **nova){
     switch (T){
     case 'N':
