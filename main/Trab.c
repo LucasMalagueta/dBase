@@ -15,7 +15,6 @@ void extrairParametros(char mat[5][15], char comando[]);
 //Funções gerais
 char compare(char str[], char str2[]);
 void strSplit(char str[], char str2[], char del);
-DBF* buscaDBF(char str[], DBF *dbf);
 
 //Interface Grafica
 #include "GUI.h"
@@ -68,7 +67,7 @@ int main() {
                 baseDBF(cmd);
                 baseCmd("CREATE");
                 Create(&unid, &dbf, arg);
-                limparArea(5, 8, 87, 19);
+                clear();
             break;
 
             case 2:
@@ -98,6 +97,11 @@ int main() {
                     ListStructure(unid, dbf);
                 }
             break;
+            
+            case 6:
+                //Foi digitado o comando "CLEAR"
+                clear();
+            break;
 
             default:
                 print2(7, 19, "Opcao invalida.\n");
@@ -108,28 +112,7 @@ int main() {
     return 0;
 }
 
-DBF* buscaDBF(char str[], DBF *dbf) {
-    DBF *aux = dbf, *ret = NULL;
-    char flag = 0;
 
-    //Ir para o começo dos DBF
-    while(aux->ant != NULL) {
-        aux = aux->ant;
-    }
-
-    //Procurar o DBF passado
-    if (compare(aux->nomeDBF, str)) {
-        ret = aux;
-    }
-    while(aux->prox != NULL) {
-        if (compare(aux->nomeDBF, str)) {
-            ret = aux;
-        }
-        aux = aux->prox;
-    }
-
-    return ret;
-}
 
 char validaComando(char str[]) {
     char flag = 0;

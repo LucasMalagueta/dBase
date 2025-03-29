@@ -51,9 +51,36 @@ union dados {
     Dados* prox;
 };
 
+//SET DEFAULT TO
+void setDefaltTo(Unidade **unid, char dir[3]);
+
+//CREATE
+void Create(Unidade **unid, DBF **dbf, char nome[50]);
 void cadastraCampo(DBF **dbf, int *x, int *y);
 void exibelinhacampo();
 void printCH(char ch);
+
+//DIR
+void Dir(Unidade *unid);
+
+//QUIT
+void quit();
+
+//USE
+void USE(DBF **aberto, DBF *atual);
+
+//LIST STRUCTURE
+void ListStructure(Unidade *unid, DBF *dbf);
+
+//APPEND
+void Append(DBF **dbf);
+void insere(char T,Dados **nova);
+
+//CLEAR
+void clear();
+
+//Demais funções
+DBF* buscaDBF(char str[], DBF *dbf);
 
 //1
 void setDefaltTo(Unidade **unid, char dir[3]) {
@@ -96,7 +123,7 @@ void setDefaltTo(Unidade **unid, char dir[3]) {
 } 
 
 //2
-void Create(Unidade **unid, DBF **dbf, char nome[50]){
+void Create(Unidade **unid, DBF **dbf, char nome[50]) {
     DBF *aux, *atual = NULL;
     char data[11], hr[9], op, ch;
     int x = 7, y = 10, count = 0;
@@ -233,7 +260,7 @@ void exibelinhacampo(int *x, int *y, int *count) {
 }
 
 //3
-void Dir(Unidade *unid){
+void Dir(Unidade *unid) {
     DBF *aux;
 
     //Verificar se a unidade existe
@@ -249,7 +276,7 @@ void Dir(Unidade *unid){
 }
 
 //4
-void quit(){
+void quit() {
     gotoxy(1, 20);
 }
 
@@ -259,7 +286,7 @@ void USE(DBF **aberto, DBF *atual) {
 }
 
 //6
-void ListStructure(Unidade *unid, DBF *dbf){
+void ListStructure(Unidade *unid, DBF *dbf) {
     Campo *campos = dbf->campos;
     int i = 1;
     if(unid !=NULL && unid->arqs !=NULL){
@@ -281,7 +308,7 @@ void ListStructure(Unidade *unid, DBF *dbf){
 void insere(char T,Dados **nova);
 
 //7
-void Append(DBF **dbf){
+void Append(DBF **dbf) {
     
     Campo *aux = (*dbf)->campos;
     Status *status = (*dbf)->status,*novastatus = NULL;
@@ -318,7 +345,7 @@ void Append(DBF **dbf){
 }
 
 //MUDAR, POIS O TYPE DA STRUCT CAMPO NÃO É MAIS CHAR E SIM STRING!
-void insere(char T,Dados **nova){
+void insere(char T,Dados **nova) {
     switch (T){
     case 'N':
         scanf("%d", &(*nova)->valorN);
@@ -343,4 +370,32 @@ void insere(char T,Dados **nova){
     default:
         break;
     }
+}
+
+//9
+void clear() {
+    limparArea(5, 8, 87, 19);
+}
+
+DBF* buscaDBF(char str[], DBF *dbf) {
+    DBF *aux = dbf, *ret = NULL;
+    char flag = 0;
+
+    //Ir para o começo dos DBF
+    while(aux->ant != NULL) {
+        aux = aux->ant;
+    }
+
+    //Procurar o DBF passado
+    if (compare(aux->nomeDBF, str)) {
+        ret = aux;
+    }
+    while(aux->prox != NULL) {
+        if (compare(aux->nomeDBF, str)) {
+            ret = aux;
+        }
+        aux = aux->prox;
+    }
+
+    return ret;
 }
