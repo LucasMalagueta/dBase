@@ -20,6 +20,7 @@ void strSplit(char str[], char str2[], char del);
 #include "GUI.h"
 //Funções principais e relacionados
 #include "Tad.h"
+#include "Pilha.h"
 
 int main() {
     Unidade *unid = NULL;
@@ -27,6 +28,14 @@ int main() {
 
     char comando[50], cmd[15], arg[15];
     char args[4][15];
+
+    Pilha *P = NULL;
+    push(&P, "oii");
+    push(&P, "tudo");
+    push(&P, "bem");
+
+    print(P);
+    system("pause");
 
     clrscr();
     textcolor(CYAN);
