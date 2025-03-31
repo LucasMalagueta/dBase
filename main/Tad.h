@@ -59,6 +59,7 @@ void Create(Unidade **unid, DBF **dbf, char nome[50]);
 void cadastraCampo(DBF **dbf, int *x, int *y);
 void exibelinhacampo();
 void printCH(char ch);
+int verificach(char ch);
 
 //DIR
 void Dir(Unidade *unid);
@@ -184,6 +185,7 @@ void Create(Unidade **unid, DBF **dbf, char nome[50]) {
             op = getch();
             fflush(stdin);
         }
+        dica1(0, " ");
         textcolor(LIGHTGRAY); textbackground(BLACK);
     }
 }
@@ -191,15 +193,21 @@ void Create(Unidade **unid, DBF **dbf, char nome[50]) {
 void cadastraCampo(DBF **dbf, int *x, int *y) {
     Campo *atual = NULL, *novo = NULL; // Cria um ponteiro auxiliar para percorrer a lista
     char ch;
+    int autentico;
 
     //Checar se o DBF existe
-    if (dbf != NULL) {
+    if (*dbf != NULL) {
         novo = (Campo *)malloc(sizeof(Campo));
         gotoxy(*x + 3, *y);
+
         scanf("%s", novo->FieldName);
+        fflush(stdin);
 
         gotoxy(*x + 15, *y);
-        ch = toupper(getch());
+        do{
+            ch = toupper(getch());
+            autentico = verificach(ch);
+        }while(autentico);
         novo->Type = ch;
         printCH(ch);
 
@@ -222,13 +230,16 @@ void cadastraCampo(DBF **dbf, int *x, int *y) {
                 atual = atual->prox;
             }
             atual->prox = novo;
-        } 
-        //Caso DBF não ter nenhum campo, novo será o primeiro
+        } //Caso DBF não ter nenhum campo, novo será o primeiro
         else {
             (*dbf)->campos = novo;
         }
     }
 
+}
+
+int verificach(char ch){
+    return ch != 'N' && ch != 'D' && ch != 'L' && ch != 'C' && ch != 'M';
 }
 
 void printCH(char ch) {
@@ -262,15 +273,17 @@ void exibelinhacampo(int *x, int *y, int *count) {
 //3
 void Dir(Unidade *unid) {
     DBF *aux;
-
+    int i = 8;
     //Verificar se a unidade existe
     if (unid->arqs != NULL) {
         aux = unid->arqs;
 
         while(aux != NULL){
-            printf("%s",unid->und);
+            gotoxy(7,i);
+            printf("%s\\",unid->und);
             printf("%s\n",aux->nomeDBF);
             aux = aux->prox;
+            i++;
         }
     }
 }
@@ -296,7 +309,7 @@ void ListStructure(Unidade *unid, DBF *dbf) {
         printf("Field      Field Name      Type      Width      Dec\n",dbf->Data);
 
         while(campos != NULL){
-            printf("%d      %s      %s      %d      %d\n",i++,campos->FieldName,campos->Type,campos->Width,campos->Dec);
+            printf("%d      %s      %c      %d      %d\n",i++,campos->FieldName,campos->Type,campos->Width,campos->Dec);
             campos = campos->prox;
         }
     }else{
@@ -309,42 +322,60 @@ void insere(char T,Dados **nova);
 
 //7
 void Append(DBF **dbf) {
-    
+
     Campo *aux = (*dbf)->campos;
     Status *status = (*dbf)->status,*novastatus = NULL;
     Dados *dados = NULL, *nova = NULL;
-
-    nova = (Dados *)malloc(sizeof(Dados));
-    novastatus = (Status *)malloc(sizeof(Status));
+    int i = 8;
 
     //Printa os Campos que existem no arq
-    while(aux != NULL){
-        printf("%s:\n",aux->FieldName);
-        aux = aux->prox;
-    }
-    aux = (*dbf)->campos;
+    if(aux != NULL){
 
-    while(aux != NULL){
-
-        dados = aux->Pdados;
-        while(dados->prox != NULL){
-            dados = dados->prox;
-            status = status->prox;
+        while(aux->prox != NULL){
+            gotoxy(7,i);
+            printf("%s:\n",aux->FieldName);
+            aux = aux->prox;
+            i++;
         }
-        dados->prox = nova;
-        nova->prox = NULL;
-        insere(aux->Type,&nova);
+        gotoxy(7,i);
+        printf("%s:\n",aux->FieldName);
 
-        aux = aux->prox;
+        aux = (*dbf)->campos;
+        i = 8;
+
+        nova = (Dados *)malloc(sizeof(Dados));
+
+        while(aux != NULL){
+            gotoxy(20,i);
+
+            dados = aux->Pdados;
+
+            if(dados != NULL){
+                
+                while(dados->prox != NULL){
+
+                    dados = dados->prox;
+                    status = status->prox;
+                }
+                dados->prox = nova;
+            }else{
+                dados = nova;
+            }
+
+            nova->prox = NULL;
+            insere(aux->Type,&nova);
+            aux = aux->prox;
+            i++;
+        }
+
+        novastatus = (Status *)malloc(sizeof(Status));
+        //preenche e liga a nova caixa status
+        status->prox = novastatus;
+        novastatus->prox = NULL;
+        novastatus->boolean = 1;
     }
-    //preenche e liga a nova caixa status
-    status->prox = novastatus;
-    novastatus->prox = NULL;
-    novastatus->boolean = 1;
-
 }
 
-//MUDAR, POIS O TYPE DA STRUCT CAMPO NÃO É MAIS CHAR E SIM STRING!
 void insere(char T,Dados **nova) {
     switch (T){
     case 'N':

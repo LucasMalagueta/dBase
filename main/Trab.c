@@ -56,6 +56,7 @@ int main() {
                         setDefaltTo(&unid, args[3]);
                         baseDir(unid->und);
                         baseDBF("");
+                        dbf = unid->arqs;
                     }
                 }
             break;
@@ -103,6 +104,11 @@ int main() {
                 clear();
             break;
 
+            case 7:
+                //Foi digitado o comando "APPEND"
+                Append(&dbf);
+            break;
+
             default:
                 print2(7, 19, "Opcao invalida.\n");
         }
@@ -117,8 +123,8 @@ int main() {
 char validaComando(char str[]) {
     char flag = 0;
     char mat[17][20] = {"SET", "CREATE", "DIR", "QUIT", "USE", "LIST", "CLEAR",
-                        "DISPLAY", "EDIT", "DELETE", "RECALL", "PACK", "ZAP", 
-                        "MODIFY", "SORT"};
+                        "APPEND", "DISPLAY", "EDIT", "DELETE", "RECALL", "PACK",
+                        "ZAP", "MODIFY", "SORT"};
 
     for (int i = 0; i < 17; i++) {
         if (strcmp(str, mat[i]) == 0) {
@@ -157,7 +163,7 @@ void lerComando(char str[]) {
 int chaveComando(char str[]) {
     char flag = 0;
     char mat[17][20] = {"SET", "CREATE", "DIR", "QUIT", "USE", "LIST", "CLEAR",
-                        "DISPLAY", "EDIT", "DELETE", "RECALL", "PACK", "ZAP", 
+                        "APPEND", "DISPLAY", "EDIT", "DELETE", "RECALL", "PACK", "ZAP", 
                         "MODIFY", "SORT"};
 
     for (int i = 0; i < 17; i++) {
