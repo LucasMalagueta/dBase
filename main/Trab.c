@@ -29,13 +29,13 @@ int main() {
     char comando[50], cmd[15], arg[15];
     char args[4][15];
 
-    Pilha *P = NULL;
-    push(&P, "oii");
-    push(&P, "tudo");
-    push(&P, "bem");
+    // Pilha *P = NULL;
+    // push(&P, "oii");
+    // push(&P, "tudo");
+    // push(&P, "bem");
 
-    print(P);
-    system("pause");
+    // print(P);
+    // system("pause");
 
     clrscr();
     textcolor(CYAN);
