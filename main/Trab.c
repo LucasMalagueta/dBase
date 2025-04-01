@@ -121,10 +121,6 @@ int main() {
                 //Foi digitado o comando "APPEND"
                 clear(&F);
                 Append(&aberto);
-                Campo *campo = aberto->campos; 
-                Dados *dado = campo->Pdados; system("pause");
-                char *str = dado->tipo.valorC;
-                print2(5,8, str);
                 clear(&F);
             break;
 

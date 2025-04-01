@@ -368,27 +368,26 @@ void Append(DBF **dbf) {
         //Enquanto existirem campos cadastra um dado para cada
         while(campo != NULL) {
             nova = (Dados *)malloc(sizeof(Dados));
-            gotoxy(20, i);
-            dados = campo->Pdados;
+            //Popular dados
+            nova->prox = NULL;
+            gotoxy(20, i); 
+            insere(campo->Type, &nova); //Chama uma captura de input
+            fflush(stdin);
 
             //Verificar se o campo tem dados ou se é o primeiro
-            if(dados != NULL) {
-                while(dados->prox != NULL) {
+            if (campo->Pdados != NULL) {
+                dados = campo->Pdados;
+                while (dados->prox != NULL) {
                     dados = dados->prox;
                 }
                 dados->prox = nova;
             } else {
-                dados = nova;
+                campo->Pdados = nova;
             }
 
-            //Popular dados
-            nova->prox = NULL;
-            insere(campo->Type, &nova); //Chama uma captura de input
-            fflush(stdin);
             campo = campo->prox;
             i++;
         }
-
         
         novastatus = (Status *)malloc(sizeof(Status));
         //Verificar se o status é o primeiro
@@ -425,13 +424,13 @@ void insere(char T, Dados **nova) {
     case 'C':
         gets(str);
         (*nova)->tipo.valorC = (char *)malloc(strlen(str)+1);
-        strcpy((*nova)->tipo.valorC,str);
+        strcpy((*nova)->tipo.valorC, str);
         break;
     
     case 'M':
         gets(str);
         (*nova)->tipo.valorM = (char *)malloc(strlen(str)+1);
-        strcpy((*nova)->tipo.valorM,str);
+        strcpy((*nova)->tipo.valorM, str);
         break;
     
     default:
