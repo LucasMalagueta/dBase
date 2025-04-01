@@ -2,7 +2,8 @@ typedef struct unidade Unidade;
 typedef struct dbf DBF;
 typedef struct status Status;
 typedef struct campo Campo;
-typedef union dados Dados;
+typedef struct dados Dados;
+typedef union tipo Tipo;
 
 struct unidade {
     struct unidade *top;
@@ -38,13 +39,13 @@ struct campo {
     Campo *prox;
 };
 
-
-union dados {
+union tipo{
     float valorN;
-    char valorD[10]; // "DD/MM/YYYY"
-    char valorL; // 'T' ou 'F'
-    char valorC[50];
-    char valorM[50];
+    char valorL, valorD[10], *valorC, *valorM;
+};
+
+struct dados {
+    Tipo tipo;
     Dados* prox;
 };
 
@@ -392,25 +393,30 @@ void Append(DBF **dbf) {
 }
 
 void insere(char T, Dados **nova) {
+    char str[50];
     switch (T){
     case 'N':
-        scanf("%f", &(*nova)->valorN);
+        scanf("%f", &(*nova)->tipo.valorN);
         break;
     
     case 'D':
-        gets((*nova)->valorD);
+        gets((*nova)->tipo.valorD);
         break;
     
     case 'L':
-        (*nova)->valorL = getch();
+        (*nova)->tipo.valorL = getch();
         break;
     
     case 'C':
-        gets((*nova)->valorC);
+        gets(str);
+        (*nova)->tipo.valorC = (char *)malloc(strlen(str)+1);
+        strcpy((*nova)->tipo.valorC,str);
         break;
     
     case 'M':
-        gets((*nova)->valorM);
+        gets(str);
+        (*nova)->tipo.valorC = (char *)malloc(strlen(str)+1);
+        strcpy((*nova)->tipo.valorC,str);
         break;
     
     default:
@@ -419,7 +425,7 @@ void insere(char T, Dados **nova) {
 }
 
 //8
-void list(DBF *dbf, Fila *F) {
+void list(DBF **dbf, Fila *F) {
     Campo *campo = NULL;
 
 }
@@ -454,33 +460,31 @@ DBF* buscaDBF(char str[], DBF *dbf) {
 }
 
 //10
-void locate(DBF **dbf,char campo[],char dado[]){
-
+void locate(DBF **dbf,char Nomecampo[],char Nomedado[]){
     int i = 1;
-    
+    //Verifica se existe campo no .dbf
     if((*dbf)->campos != NULL){
 
-        Campo *aux = (*dbf)->campos;
+        Campo *campo = (*dbf)->campos;
 
-        while(aux !=NULL && !compare(campo,aux->FieldName)){
-
-            aux = aux->prox;
+        while(campo !=NULL && !compare(Nomecampo,campo->FieldName)){
+            campo = campo->prox;
         }
         
-        if(compare(campo,aux->FieldName)){
+        if(compare(Nomecampo,campo->FieldName)){
 
-            if(aux->Pdados != NULL){
+            if(campo->Pdados != NULL){
 
                 Status *status = (*dbf)->status;
-                Dados *auxdado = aux->Pdados;
-                while(auxdado !=NULL && !compare(campo,auxdado->valorC) && status->boolean){
+                Dados *dado = campo->Pdados;
+                while(dado !=NULL && !compare(Nomedado,dado->tipo.valorC) && status->boolean){
 
-                    auxdado = auxdado->prox;
+                    dado = dado->prox;
                     status = status->prox;
                     i++;
                 }
 
-                if(compare(campo,auxdado->valorC))
+                if(compare(Nomedado,dado->tipo.valorC))
                     printf("Record = %d",i);
                 
                 else
@@ -488,7 +492,8 @@ void locate(DBF **dbf,char campo[],char dado[]){
                 
             }
 
-        }
+        }else
+            printf("Campo nao encontrado!");
 
     }
     

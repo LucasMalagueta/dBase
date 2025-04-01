@@ -245,7 +245,7 @@ void extraiAspas(char str[],char str2[]){
     }
     i++;
 
-    for (j = 0; str[i] != '\0' || str[i] != '"'; i++, j++) {
+    for (j = 0; str[i] != '\0' && str[i] != '"'; i++, j++) {
         str2[j] = str[i];
     }
     str2[j] = '\0';
