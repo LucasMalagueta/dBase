@@ -63,6 +63,7 @@ int main() {
                         baseDir(unid->und);
                         baseDBF("");
                         dbf = unid->arqs;
+                        aberto = dbf;
                     }
                 }
             break;
@@ -73,7 +74,7 @@ int main() {
                 strSplit(arg, cmd, '.');
                 baseDBF(cmd);
                 baseCmd("CREATE");
-                Create(&unid, &dbf, arg);
+                Create(&unid, &aberto, arg);
                 exibir(&F);
             break;
 
@@ -100,9 +101,14 @@ int main() {
 
             case 5:
                 //Foi digitado comando que começa com "LIST"
-                extrairParametros(args, comando);
-                if (compare(args[1], "STRUCTURE")) {
-                    ListStructure(unid, dbf);
+                if (compare(comando, "LIST")) {
+                    list(&aberto, &F);
+                    
+                } else {
+                    extrairParametros(args, comando);
+                    if (compare(args[1], "STRUCTURE")) {
+                        ListStructure(unid, dbf);
+                    }
                 }
             break;
             
@@ -113,27 +119,23 @@ int main() {
 
             case 7:
                 //Foi digitado o comando "APPEND"
-                Append(&dbf);
+                Append(&aberto);
                 clear(&F);
             break;
-
-            // case 8:
-
-            // break;
 
             case 9:
                 extrairParametros(args, comando);
                 //"LOCATE FOR..."
                 if (compare(args[1], "FOR")) {
                     extraiAspas(comando,dado);
-                    locate(&dbf,args[2],dado);
+                    locate(&aberto, args[2],dado);
                 }
             break;
 
             case 10:
                 //Foi digitado o comando "GOTO"
                 extrairParametros(args, comando);
-                gotodado(&dbf,args[1]);
+                gotodado(&aberto, args[1]);
             break;
 
             default:

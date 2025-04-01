@@ -329,8 +329,6 @@ void ListStructure(Unidade *unid, DBF *dbf) {
     
 }
 
-void insere(char T,Dados **nova);
-
 //7
 void Append(DBF **dbf) {
     Campo *campo = (*dbf)->campos;
@@ -418,6 +416,12 @@ void insere(char T, Dados **nova) {
     default:
         break;
     }
+}
+
+//8
+void list(DBF *dbf, Fila *F) {
+    Campo *campo = NULL;
+
 }
 
 //9
