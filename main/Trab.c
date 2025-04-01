@@ -11,6 +11,7 @@ void lerComando(char str[]);
 int chaveComando(char str[]);
 void extrairParametro(char str[], char str2[]) ;
 void extrairParametros(char mat[5][15], char comando[]);
+void extraiAspas(char str[],char str2[]);
 
 //Funções gerais
 char compare(char str[], char str2[]);
@@ -26,7 +27,7 @@ int main() {
     Unidade *unid = NULL;
     DBF *dbf = NULL, *aberto = NULL;
 
-    char comando[50], cmd[15], arg[15];
+    char comando[50], cmd[15], arg[15], dado[25];
     char args[4][15];
 
     // Pilha *P = NULL;
@@ -118,6 +119,25 @@ int main() {
                 Append(&dbf);
             break;
 
+            // case 8:
+
+            // break;
+
+            case 9:
+                extrairParametros(args, comando);
+                //"LOCATE FOR..."
+                if (compare(args[1], "FOR")) {
+                    extraiAspas(comando,dado);
+                    locate(&dbf,args[2],dado);
+                }
+            break;
+
+            case 10:
+                //Foi digitado o comando "GOTO"
+                extrairParametros(args, comando);
+                gotodado(&dbf,args[1]);
+            break;
+
             default:
                 print2(7, 19, "Opcao invalida.\n");
         }
@@ -131,11 +151,11 @@ int main() {
 
 char validaComando(char str[]) {
     char flag = 0;
-    char mat[17][20] = {"SET", "CREATE", "DIR", "QUIT", "USE", "LIST", "CLEAR",
-                        "APPEND", "DISPLAY", "EDIT", "DELETE", "RECALL", "PACK",
-                        "ZAP", "MODIFY", "SORT"};
+    char mat[18][20] = {"SET", "CREATE", "DIR", "QUIT", "USE", "LIST", "CLEAR",
+                        "APPEND", "DISPLAY", "LOCATE", "GOTO", "EDIT", "DELETE",
+                        "RECALL", "PACK", "ZAP", "MODIFY", "SORT"};
 
-    for (int i = 0; i < 17; i++) {
+    for (int i = 0; i < 18; i++) {
         if (strcmp(str, mat[i]) == 0) {
             flag = 1;
         }
@@ -171,11 +191,11 @@ void lerComando(char str[]) {
 
 int chaveComando(char str[]) {
     char flag = 0;
-    char mat[17][20] = {"SET", "CREATE", "DIR", "QUIT", "USE", "LIST", "CLEAR",
-                        "APPEND", "DISPLAY", "EDIT", "DELETE", "RECALL", "PACK", "ZAP", 
+    char mat[18][20] = {"SET", "CREATE", "DIR", "QUIT", "USE", "LIST", "CLEAR",
+                        "APPEND", "DISPLAY", "LOCATE", "GOTO", "EDIT", "DELETE", "RECALL", "PACK", "ZAP", 
                         "MODIFY", "SORT"};
 
-    for (int i = 0; i < 17; i++) {
+    for (int i = 0; i < 18; i++) {
         if (strcmp(str, mat[i]) == 0) {
             flag = i;
         }
@@ -214,4 +234,18 @@ void extrairParametros(char mat[5][15], char comando[]) {
 
 char compare(char str[], char str2[]) {
     return (strcmp(str, str2) == 0);
+}
+
+void extraiAspas(char str[],char str2[]){
+    int i = 0, j;
+
+    while (str[i] != '"') {
+        i++;
+    }
+    i++;
+
+    for (j = 0; str[i] != '\0' || str[i] != '"'; i++, j++) {
+        str2[j] = str[i];
+    }
+    str2[j] = '\0';
 }

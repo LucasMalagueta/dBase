@@ -430,3 +430,69 @@ DBF* buscaDBF(char str[], DBF *dbf) {
 
     return ret;
 }
+
+//10
+void locate(DBF **dbf,char campo[],char dado[]){
+
+    int i = 1;
+    
+    if((*dbf)->campos != NULL){
+
+        Campo *aux = (*dbf)->campos;
+
+        while(aux !=NULL && !compare(campo,aux->FieldName)){
+
+            aux = aux->prox;
+        }
+        
+        if(compare(campo,aux->FieldName)){
+
+            if(aux->Pdados != NULL){
+
+                Status *status = (*dbf)->status;
+                Dados *auxdado = aux->Pdados;
+                while(auxdado !=NULL && !compare(campo,auxdado->valorC) && status->boolean){
+
+                    auxdado = auxdado->prox;
+                    status = status->prox;
+                    i++;
+                }
+
+                if(compare(campo,auxdado->valorC))
+                    printf("Record = %d",i);
+                
+                else
+                    printf("Registro nao encontrado!");
+                
+            }
+
+        }
+
+    }
+    
+}
+
+//11
+void gotodado(DBF **dbf,char reg[0]){
+
+    int i = reg[0] - 48;
+    //verifica se existe campo no .dbf
+    if((*dbf)->campos != NULL){
+
+        Campo *campo = (*dbf)->campos;
+        Dados *dado;
+        //verifica se o campo e NULL e percorre todos
+        while(campo != NULL){
+            dado = campo->Pdados;
+            //percorre a qntd de vezes que o usuario digitou no campo dados
+            for(; i <= 0 && dado != NULL; i--){
+                dado = dado->prox;
+            }
+            if(dado != NULL){
+                campo->Patual = dado;
+            }
+            campo = campo->prox;
+        }
+    }
+
+}
