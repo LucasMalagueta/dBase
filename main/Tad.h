@@ -416,8 +416,8 @@ void insere(char T, Dados **nova) {
     
     case 'M':
         gets(str);
-        (*nova)->tipo.valorC = (char *)malloc(strlen(str)+1);
-        strcpy((*nova)->tipo.valorC,str);
+        (*nova)->tipo.valorM = (char *)malloc(strlen(str)+1);
+        strcpy((*nova)->tipo.valorM,str);
         break;
     
     default:
@@ -432,7 +432,7 @@ void list(DBF **dbf, Fila *F) {
     int i;
 
     if (dbf != NULL) {
-        campo = dbf->campos;
+        campo = (*dbf)->campos;
 
         if (campo != NULL) {
             inserir(F, ". LIST");
@@ -445,35 +445,35 @@ void list(DBF **dbf, Fila *F) {
             inserir(F, linha);
 
             //Guardar conteudos
-            i = 1;
-            campo = dbf->campos;
-            while(campo != NULL) {
-                sprintf(linha, "\t%d", i);
+            // i = 1;
+            // campo = (*dbf)->campos;
+            // while(campo != NULL) {
+            //     sprintf(linha, "\t%d", i);
                 
-                switch (campo->Type) {
-                    case 'N':
-                        sprintf(linha, "%s\t%d", linha, campo->Pdados->valorN);
-                    break;
+            //     switch (campo->Type) {
+            //         case 'N':
+            //             sprintf(linha, "%s\t%d", linha, campo->Patual->tipo.valorN);
+            //         break;
                     
-                    case 'D':
-                        sprintf(linha, "%s\t%s", linha, campo->Pdados->valorD);
-                    break;
+            //         case 'D':
+            //             sprintf(linha, "%s\t%s", linha, campo->Patual->tipo.valorN);
+            //         break;
                     
-                    case 'L':
-                        sprintf(linha, "%s\t%c", linha, campo->Pdados->valorL);
-                    break;
+            //         case 'L':
+            //             sprintf(linha, "%s\t%c", linha, campo->Patual->tipo.valorN);
+            //         break;
                     
-                    case 'C':
-                        sprintf(linha, "%s\t%s", linha, campo->Pdados->valorC);
-                    break;
+            //         case 'C':
+            //             sprintf(linha, "%s\t%s", linha, campo->Patual->tipo.valorN);
+            //         break;
                     
-                    case 'M':
-                        sprintf(linha, "%s\t%s", linha, campo->Pdados->valorM);
-                    break;
-                }
-                campo = campo->prox;
-            }
-            inserir(F, linha);
+            //         case 'M':
+            //             sprintf(linha, "%s\t%s", linha, campo->Patual->tipo.valorN);
+            //         break;
+            //     }
+            //     campo = campo->prox;
+            // }
+            // inserir(F, linha);
         }
     }
 }

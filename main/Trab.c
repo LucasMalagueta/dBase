@@ -102,7 +102,7 @@ int main() {
             case 5:
                 //Foi digitado comando que começa com "LIST"
                 if (compare(comando, "LIST")) {
-                    list(aberto, &F);
+                    list(&aberto, &F);
                     exibir(&F);
                 } else {
                     extrairParametros(args, comando);
@@ -121,6 +121,10 @@ int main() {
                 //Foi digitado o comando "APPEND"
                 clear(&F);
                 Append(&aberto);
+                Campo *campo = aberto->campos; 
+                Dados *dado = campo->Pdados; system("pause");
+                char *str = dado->tipo.valorC;
+                print2(5,8, str);
                 clear(&F);
             break;
 
