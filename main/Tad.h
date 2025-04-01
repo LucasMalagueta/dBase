@@ -62,6 +62,7 @@ int verificach(char ch);
 //DIR
 void Dir(Unidade *unid, Fila *F);
 int contaRecords(Status *status);
+int recordAtual(Status *status, Status *pos);
 
 //QUIT
 void quit();
@@ -291,6 +292,7 @@ void Dir(Unidade *unid, Fila *F) {
 int contaRecords(Status *status) {
     Status *aux = status;
     int i = 0;
+
     while(aux != NULL) {
         if(aux->boolean) {
             i++;
@@ -298,6 +300,17 @@ int contaRecords(Status *status) {
         aux = aux->prox;
     }
     return i;
+}
+
+int recordAtual(Status *status, Status *pos){
+    int i = 0;
+    while (status != NULL) {
+        if (status == pos)
+            return i;
+        status = status->prox; // Avança na lista
+        i++;
+    }
+    return -1;
 }
 
 //4
@@ -314,6 +327,7 @@ void USE(DBF **aberto, DBF *atual) {
 void ListStructure(Unidade *unid, DBF *dbf) {
     Campo *campos = dbf->campos;
     int i = 1;
+
     if(unid !=NULL && unid->arqs !=NULL){
         printf("Structure for database: %s%s\n",unid->und,dbf->nomeDBF);
         printf("Number of the data records: \n");
@@ -509,11 +523,15 @@ DBF* buscaDBF(char str[], DBF *dbf) {
 
 //10
 void locate(DBF **dbf,char Nomecampo[],char Nomedado[]){
-    int i = 1;
+
+    Status *status = NULL;
+    Dados *dado = NULL;
+    Campo *campo = NULL;
+
     //Verifica se existe campo no .dbf
     if((*dbf)->campos != NULL){
 
-        Campo *campo = (*dbf)->campos;
+        campo = (*dbf)->campos;
 
         while(campo !=NULL && !compare(Nomecampo,campo->FieldName)){
             campo = campo->prox;
@@ -523,17 +541,16 @@ void locate(DBF **dbf,char Nomecampo[],char Nomedado[]){
 
             if(campo->Pdados != NULL){
 
-                Status *status = (*dbf)->status;
-                Dados *dado = campo->Pdados;
+                status = (*dbf)->status;
+                dado = campo->Pdados;
                 while(dado !=NULL && !compare(Nomedado,dado->tipo.valorC) && status->boolean){
 
                     dado = dado->prox;
                     status = status->prox;
-                    i++;
                 }
 
                 if(compare(Nomedado,dado->tipo.valorC))
-                    printf("Record = %d",i);
+                    printf("Record = %d",contaRecords((*dbf)->status));
                 
                 else
                     printf("Registro nao encontrado!");
@@ -570,4 +587,26 @@ void gotodado(DBF **dbf,char reg[0]){
         }
     }
 
+}
+
+void deleteAll(DBF **dbf){
+
+    Status *status = NULL;
+
+    if((*dbf)->status != NULL){
+        status = (*dbf)->status;
+
+        while(status != NULL && status->boolean){
+
+            status->boolean = 0;
+            status->prox;
+        }
+    }
+}
+
+void delete(Status **status){
+
+    if(*status != NULL && (*status)->boolean){
+        (*status)->boolean = 0;
+    }
 }
