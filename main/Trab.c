@@ -102,7 +102,7 @@ int main() {
             case 5:
                 //Foi digitado comando que começa com "LIST"
                 if (compare(comando, "LIST")) {
-                    list(&aberto, &F);
+                    list(aberto, &F);
                     exibir(&F);
                 } else {
                     extrairParametros(args, comando);

@@ -440,19 +440,20 @@ void insere(char T, Dados **nova) {
 }
 
 //8
-void list(DBF **dbf, Fila *F) {
+void list(DBF *dbf, Fila *F) {
     Campo *campo = NULL;
-    Dados *dado = NULL;
+    Dados *dado = NULL, *nivelDado = NULL;
     char linha[100], ch;
     int i;
 
-    if (*dbf != NULL) {
-        campo = (*dbf)->campos;
+    if (dbf != NULL) {
+        campo = dbf->campos;
 
         if (campo != NULL) {
-            dado = campo->Pdados;
+            dado = campo->Patual;
 
             if (dado != NULL) {
+                //Guarda comando
                 inserir(F, ". LIST");
                 //Guardar titulos
                 sprintf(linha, "%s", "Record#");
@@ -464,41 +465,49 @@ void list(DBF **dbf, Fila *F) {
 
                 //Guardar conteudos
                 i = 1;
-                campo = (*dbf)->campos;
-                while(campo != NULL) {
+                nivelDado = dbf->campos->Patual;
+                while (nivelDado != NULL) {
+                    campo = dbf->campos;
                     sprintf(linha, "\t%d", i);
-                    
-                    dado = campo->Patual;
+                    while(campo != NULL) {
+                        dado = campo->Patual;
 
-                    if (dado != NULL) {
-                        switch (campo->Type) {
-                            case 'N':
-                                sprintf(linha, "%s\t%d", linha, dado->tipo.valorN);
-                            break;
-                            
-                            case 'D':
-                                sprintf(linha, "%s\t%s", linha, dado->tipo.valorD);
-                            break;
-                            
-                            case 'L':
-                                sprintf(linha, "%s\t%c", linha, dado->tipo.valorL);
-                            break;
-                            
-                            case 'C':
-                                sprintf(linha, "%s\t%s", linha, dado->tipo.valorC);
-                            break;
-                            
-                            case 'M':
-                                sprintf(linha, "%s\t%s", linha, dado->tipo.valorM);
-                            break;
+                        for(int x = i; x > 1; x--) {
+                            dado = dado->prox;
                         }
-
+    
+                        if (dado != NULL) {
+                            switch (campo->Type) {
+                                case 'N':
+                                    sprintf(linha, "%s\t%.0f", linha, dado->tipo.valorN);
+                                break;
+                                
+                                case 'D':
+                                    sprintf(linha, "%s\t%s", linha, dado->tipo.valorD);
+                                break;
+                                
+                                case 'L':
+                                    sprintf(linha, "%s\t%c", linha, dado->tipo.valorL);
+                                break;
+                                
+                                case 'C':
+                                    sprintf(linha, "%s\t%s", linha, dado->tipo.valorC);
+                                break;
+                                
+                                case 'M':
+                                    sprintf(linha, "%s\t%s", linha, dado->tipo.valorM);
+                                break;
+                            }
+    
+                        }
+                        campo = campo->prox;
                     }
-                    campo = campo->prox;
+                    inserir(F, linha);
+                    i++;
+                    nivelDado = nivelDado->prox; //Nivel dado e i++ ajudam a definir quantos niveis pra baixo 
+                    //é necessario ir para recuperar o reg atual
                 }
-                inserir(F, linha);                
             }
-
         }
     }
 }
