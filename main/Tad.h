@@ -369,6 +369,7 @@ void Append(DBF **dbf) {
             //Popular dados
             nova->prox = NULL;
             insere(campo->Type, &nova); //Chama uma captura de input
+            fflush(stdin);
             campo = campo->prox;
             i++;
         }
@@ -421,7 +422,54 @@ void insere(char T, Dados **nova) {
 //8
 void list(DBF *dbf, Fila *F) {
     Campo *campo = NULL;
+    char linha[100];
+    int i;
 
+    if (dbf != NULL) {
+        campo = dbf->campos;
+
+        if (campo != NULL) {
+            inserir(F, ". LIST");
+            //Guardar titulos
+            sprintf(linha, "%s", "Record#");
+            while(campo != NULL) {
+                sprintf(linha, "%s\t%s", linha, campo->FieldName);
+                campo = campo->prox;
+            }
+            inserir(F, linha);
+
+            //Guardar conteudos
+            i = 1;
+            campo = dbf->campos;
+            while(campo != NULL) {
+                sprintf(linha, "\t%d", i);
+                
+                switch (campo->Type) {
+                    case 'N':
+                        sprintf(linha, "%s\t%d", linha, campo->Pdados->valorN);
+                    break;
+                    
+                    case 'D':
+                        sprintf(linha, "%s\t%s", linha, campo->Pdados->valorD);
+                    break;
+                    
+                    case 'L':
+                        sprintf(linha, "%s\t%c", linha, campo->Pdados->valorL);
+                    break;
+                    
+                    case 'C':
+                        sprintf(linha, "%s\t%s", linha, campo->Pdados->valorC);
+                    break;
+                    
+                    case 'M':
+                        sprintf(linha, "%s\t%s", linha, campo->Pdados->valorM);
+                    break;
+                }
+                campo = campo->prox;
+            }
+            inserir(F, linha);
+        }
+    }
 }
 
 //9

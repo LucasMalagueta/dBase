@@ -102,8 +102,8 @@ int main() {
             case 5:
                 //Foi digitado comando que começa com "LIST"
                 if (compare(comando, "LIST")) {
-                    list(&aberto, &F);
-                    
+                    list(aberto, &F);
+                    exibir(&F);
                 } else {
                     extrairParametros(args, comando);
                     if (compare(args[1], "STRUCTURE")) {
@@ -119,6 +119,7 @@ int main() {
 
             case 7:
                 //Foi digitado o comando "APPEND"
+                clear(&F);
                 Append(&aberto);
                 clear(&F);
             break;
