@@ -104,10 +104,19 @@ int main() {
                 if (compare(comando, "LIST")) {
                     list(aberto, &F);
                     exibir(&F);
-                } else {
+                }
+                //Comando tem paramestros alem de LIST
+                else {
                     extrairParametros(args, comando);
+
                     if (compare(args[1], "STRUCTURE")) {
                         ListStructure(unid, dbf);
+                    }
+                    
+                    else {                        
+                        if (compare(args[1], "FOR")) {
+                            
+                        }
                     }
                 }
             break;
