@@ -18,9 +18,10 @@ void strSplit(char str[], char str2[], char del);
 
 //Interface Grafica
 #include "GUI.h"
+//Fila de impressão
+#include "Fila.h"
 //Funções principais e relacionados
 #include "Tad.h"
-#include "Pilha.h"
 
 int main() {
     Unidade *unid = NULL;
@@ -29,13 +30,8 @@ int main() {
     char comando[50], cmd[15], arg[15];
     char args[4][15];
 
-    // Pilha *P = NULL;
-    // push(&P, "oii");
-    // push(&P, "tudo");
-    // push(&P, "bem");
-
-    // print(P);
-    // system("pause");
+    Fila F; 
+    inicializar(&F);
 
     clrscr();
     textcolor(CYAN);
@@ -77,12 +73,13 @@ int main() {
                 baseDBF(cmd);
                 baseCmd("CREATE");
                 Create(&unid, &dbf, arg);
-                clear();
+                exibir(&F);
             break;
 
             case 2:
                 //Foi digitado o comando "DIR"
-                Dir(unid);
+                Dir(unid, &F);
+                exibir(&F);
             break;
 
             case 3:
@@ -110,16 +107,18 @@ int main() {
             
             case 6:
                 //Foi digitado o comando "CLEAR"
-                clear();
+                clear(&F);
             break;
 
             case 7:
                 //Foi digitado o comando "APPEND"
                 Append(&dbf);
+                clear(&F);
             break;
 
             default:
-                print2(7, 19, "Opcao invalida.\n");
+                //print2(7, 19, "Opcao invalida.\n");
+            break;
         }
         
     } while (chaveComando(cmd) != 3);

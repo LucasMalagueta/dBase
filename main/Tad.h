@@ -19,9 +19,6 @@ struct dbf {
     Status* status; // 'A' = Aberto, 'F' = Fechado
     Campo *campos; // Lista encadeada de campos
     DBF *prox;
-
-    //NAO TEM ESSE CAMPO NA REPRESENTAÇÃO
-    union Registro *registros; // Lista encadeada de registros
 };
 
 
@@ -62,7 +59,8 @@ void printCH(char ch);
 int verificach(char ch);
 
 //DIR
-void Dir(Unidade *unid);
+void Dir(Unidade *unid, Fila *F);
+int contaRecords(Status *status);
 
 //QUIT
 void quit();
@@ -271,21 +269,34 @@ void exibelinhacampo(int *x, int *y, int *count) {
 }
 
 //3
-void Dir(Unidade *unid) {
+void Dir(Unidade *unid, Fila *F) {
     DBF *aux;
-    int i = 8;
+    char linha[100];
+    
     //Verificar se a unidade existe
     if (unid->arqs != NULL) {
+        inserir(F, ". DIR");
+        inserir(F, "Database Files\t#Records\tLast Update\tSize");
         aux = unid->arqs;
 
-        while(aux != NULL){
-            gotoxy(7,i);
-            printf("%s\\",unid->und);
-            printf("%s\n",aux->nomeDBF);
+        while(aux != NULL) {
+            sprintf(linha, "%s\t\t%d\t\t%s\t%d", aux->nomeDBF, contaRecords(aux->status), aux->Data, 0);
+            inserir(F, linha);
             aux = aux->prox;
-            i++;
         }
     }
+}
+
+int contaRecords(Status *status) {
+    Status *aux = status;
+    int i = 0;
+    while(aux != NULL) {
+        if(aux->boolean) {
+            i++;
+        }
+        aux = aux->prox;
+    }
+    return i;
 }
 
 //4
@@ -322,64 +333,70 @@ void insere(char T,Dados **nova);
 
 //7
 void Append(DBF **dbf) {
-
-    Campo *aux = (*dbf)->campos;
-    Status *status = (*dbf)->status,*novastatus = NULL;
+    Campo *campo = (*dbf)->campos;
+    Status *status = (*dbf)->status, *novastatus = NULL;
     Dados *dados = NULL, *nova = NULL;
     int i = 8;
 
-    //Printa os Campos que existem no arq
-    if(aux != NULL){
-
-        while(aux->prox != NULL){
-            gotoxy(7,i);
-            printf("%s:\n",aux->FieldName);
-            aux = aux->prox;
+    //Se os campos existem
+    if(campo != NULL) {
+        //Printa os Campos que existem no arq
+        while(campo->prox != NULL){
+            gotoxy(7, i);
+            printf("%s:\n",campo->FieldName);
+            campo = campo->prox;
             i++;
         }
-        gotoxy(7,i);
-        printf("%s:\n",aux->FieldName);
+        gotoxy(7, i);
+        printf("%s:\n", campo->FieldName);
 
-        aux = (*dbf)->campos;
+        campo = (*dbf)->campos;
         i = 8;
+        //Enquanto existirem campos cadastra um dado para cada
+        while(campo != NULL) {
+            nova = (Dados *)malloc(sizeof(Dados));
+            gotoxy(20, i);
+            dados = campo->Pdados;
 
-        nova = (Dados *)malloc(sizeof(Dados));
-
-        while(aux != NULL){
-            gotoxy(20,i);
-
-            dados = aux->Pdados;
-
-            if(dados != NULL){
-                
-                while(dados->prox != NULL){
-
+            //Verificar se o campo tem dados ou se é o primeiro
+            if(dados != NULL) {
+                while(dados->prox != NULL) {
                     dados = dados->prox;
-                    status = status->prox;
                 }
                 dados->prox = nova;
-            }else{
+            } else {
                 dados = nova;
             }
 
+            //Popular dados
             nova->prox = NULL;
-            insere(aux->Type,&nova);
-            aux = aux->prox;
+            insere(campo->Type, &nova); //Chama uma captura de input
+            campo = campo->prox;
             i++;
         }
 
+        
         novastatus = (Status *)malloc(sizeof(Status));
+        //Verificar se o status é o primeiro
+        if(status != NULL) {
+            while(status->prox != NULL) {
+                status = status->prox;
+            }
+            status->prox = novastatus;
+        } else {
+            status = novastatus;
+        }
         //preenche e liga a nova caixa status
         status->prox = novastatus;
-        novastatus->prox = NULL;
-        novastatus->boolean = 1;
+        novastatus->prox = NULL; 
+        novastatus->boolean = 1; 
     }
 }
 
-void insere(char T,Dados **nova) {
+void insere(char T, Dados **nova) {
     switch (T){
     case 'N':
-        scanf("%d", &(*nova)->valorN);
+        scanf("%f", &(*nova)->valorN);
         break;
     
     case 'D':
@@ -404,8 +421,9 @@ void insere(char T,Dados **nova) {
 }
 
 //9
-void clear() {
+void clear(Fila *F) {
     limparArea(5, 8, 87, 19);
+    inicializar(F);
 }
 
 DBF* buscaDBF(char str[], DBF *dbf) {
