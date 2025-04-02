@@ -8,7 +8,7 @@ void base();
 void baseDir(char*);
 void baseCmd(char*);
 void baseDBF(char*);
-void baseRec(char*);
+void baseRec(int,int);
 void createCampos();
 void createCampos2();
 void mainScreen();
@@ -24,7 +24,7 @@ void mainScreen() {
     instrucoes();
     base();
     baseDir(" ");
-    baseRec("none");
+    baseRec(0, 0);
     dica1(0, "Enter a dBASE III PLUS command");
 }
 
@@ -73,12 +73,12 @@ void baseDBF(char DBF[]) {
     textcolor(LIGHTGRAY); textbackground(BLACK);
 }
 
-void baseRec(char rec[]) {
+void baseRec(int qtd,int total) {
     char str[10];
     textcolor(BLACK); textbackground(LIGHTGRAY);
     limparLinha(52, 67, 20);
     //Linha dbf
-    sprintf(str, "Rec: %s", rec);
+    sprintf(str, "Rec: %d/%d", qtd, total);
     print2(52, 20, str);
     textcolor(LIGHTGRAY); textbackground(BLACK);
 }

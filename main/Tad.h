@@ -374,69 +374,76 @@ char* returnCH(char ch) {
 
 //7
 void Append(DBF **dbf) {
-    Campo *campo = (*dbf)->campos;
-    Status *status = (*dbf)->status, *novastatus = NULL;
+    Campo *campo = NULL;
+    Status *status = NULL, *novastatus = NULL;
     Dados *dados = NULL, *nova = NULL;
     int i = 8;
-
-    //Se os campos existem
-    if(campo != NULL) {
-        //Printa os Campos que existem no arq
-        while(campo->prox != NULL){
-            gotoxy(7, i);
-            printf("%s:\n",campo->FieldName);
-            campo = campo->prox;
-            i++;
-        }
-        gotoxy(7, i);
-        printf("%s:\n", campo->FieldName);
-
+    
+    if(*dbf!=NULL){
         campo = (*dbf)->campos;
-        i = 8;
-        //Enquanto existirem campos cadastra um dado para cada
-        while(campo != NULL) {
-            nova = (Dados *)malloc(sizeof(Dados));
-            //Popular dados
-            nova->prox = NULL;
-            gotoxy(20, i); 
-            insere(campo->Type, &nova); //Chama uma captura de input
-            fflush(stdin);
+        //Se os campos existem
+        if(campo != NULL) {
 
-            //Verificar se o campo tem dados ou se é o primeiro
-            if (campo->Pdados != NULL) {
-                dados = campo->Pdados;
-                while (dados->prox != NULL) {
-                    dados = dados->prox;
+            //Printa os Campos que existem no arq
+            while(campo->prox != NULL){
+                gotoxy(7, i);
+                printf("%s:\n",campo->FieldName);
+                campo = campo->prox;
+                i++;
+            }
+            gotoxy(7, i);
+            printf("%s:\n", campo->FieldName);
+
+            campo = (*dbf)->campos;
+            i = 8;
+            //Enquanto existirem campos cadastra um dado para cada
+            while(campo != NULL) {
+                nova = (Dados *)malloc(sizeof(Dados));
+                //Popular dados
+                nova->prox = NULL;
+                gotoxy(20, i); 
+                insere(campo->Type, &nova); //Chama uma captura de input
+                fflush(stdin);
+
+                //Verificar se o campo tem dados ou se é o primeiro
+                if (campo->Pdados != NULL) {
+                    dados = campo->Pdados;
+                    status = (*dbf)->status;
+                    while (dados->prox != NULL && status->prox != NULL) {
+                        dados = dados->prox;
+                        status = status->prox;
+                    }
+                    dados->prox = nova;
+                } else {
+                    campo->Patual = nova;
+                    campo->Pdados = nova;
                 }
-                dados->prox = nova;
-            } else {
-                campo->Patual = nova;
-                campo->Pdados = nova;
-            }
 
-            campo = campo->prox;
-            i++;
-        }
-        
-        novastatus = (Status *)malloc(sizeof(Status));
-        //Verificar se o status é o primeiro
-        if(status != NULL) {
-            while(status->prox != NULL) {
-                status = status->prox;
+                campo = campo->prox;
+                i++;
             }
-            status->prox = novastatus;
-        } else {
-            status = novastatus;
+            
+            novastatus = (Status *)malloc(sizeof(Status));
+            //Verificar se o status é o primeiro
+            if((*dbf)->status != NULL) {
+                while(status->prox != NULL) {
+                    status = status->prox;
+                }
+                status->prox = novastatus;
+            } else {
+                (*dbf)->status = novastatus;
+            }
+            //preenche e liga a nova caixa status
+            novastatus->prox = NULL; 
+            novastatus->boolean = 1; 
         }
-        //preenche e liga a nova caixa status
-        status->prox = novastatus;
-        novastatus->prox = NULL; 
-        novastatus->boolean = 1; 
+        baseRec(0,contaRecords((*dbf)->status));
     }
 }
 
 void insere(char T, Dados **nova) {
     char str[50];
+
     switch (T){
     case 'N':
         scanf("%f", &(*nova)->tipo.valorN);
@@ -613,20 +620,27 @@ void locate(DBF **dbf,char Nomecampo[],char Nomedado[]){
 }
 
 //11
-void gotodado(DBF **dbf,char reg[0]){
+void gotodado(DBF **dbf,char reg[]){
 
-    int i = reg[0] - 48;
+    Campo *campo = NULL;
+    Dados *dado = NULL;
+    Status *status = NULL;
+    int i = atoi(reg);
+
     //verifica se existe campo no .dbf
-    if((*dbf)->campos != NULL){
+    if((*dbf)->campos != NULL && (*dbf)->status != NULL){
 
-        Campo *campo = (*dbf)->campos;
-        Dados *dado;
+        campo = (*dbf)->campos;
+        status = (*dbf)->status;
         //verifica se o campo e NULL e percorre todos
         while(campo != NULL){
             dado = campo->Pdados;
+            status = (*dbf)->status;
+
             //percorre a qntd de vezes que o usuario digitou no campo dados
-            for(; i <= 0 && dado != NULL; i--){
+            for(; i > 0 && dado != NULL; i--){
                 dado = dado->prox;
+                status = status->prox;
             }
             if(dado != NULL){
                 campo->Patual = dado;
@@ -634,8 +648,10 @@ void gotodado(DBF **dbf,char reg[0]){
             campo = campo->prox;
         }
     }
+    baseRec(recordAtual((*dbf)->status,status),contaRecords((*dbf)->status));
 
 }
+
 
 void deleteAll(DBF **dbf){
 

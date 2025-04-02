@@ -58,6 +58,7 @@ int main() {
                         baseDBF("");
                         dbf = unid->arqs;
                         aberto = dbf;
+                        mainScreen();
                     }
                 }
             break;
