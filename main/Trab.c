@@ -69,6 +69,7 @@ int main() {
                 if (validaCreate(arg)) {
                     baseDBF(arg);
                     baseCmd("CREATE");
+                    clear(&F);
                     Create(&unid, &aberto, arg);
                     exibir(&F);
                 }

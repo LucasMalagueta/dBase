@@ -276,6 +276,7 @@ void exibelinhacampo(int *x, int *y, int *count) {
 void Dir(Unidade *unid, Fila *F) {
     DBF *aux;
     char linha[100];
+    int soma = 0, i = 1;
     
     //Verificar se a unidade existe
     if (unid->arqs != NULL) {
@@ -286,8 +287,14 @@ void Dir(Unidade *unid, Fila *F) {
         while(aux != NULL) {
             sprintf(linha, "%s\t\t%d\t\t%s\t%d", aux->nomeDBF, contaRecords(aux->status), aux->Data, sizeof(*aux));
             inserir(F, linha);
+            soma += sizeof(*aux);
+            i++;
             aux = aux->prox;
         }
+
+        inserir(F, " ");
+        sprintf(linha, "\t%d Bytes in\t%d files.", soma, i);
+        inserir(F, linha);
     }
 }
 
