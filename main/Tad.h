@@ -620,7 +620,7 @@ void locate(DBF **dbf,char Nomecampo[],char Nomedado[]){
 }
 
 //11
-void gotodado(DBF **dbf,char reg[]){
+void gotodado(DBF **dbf,Status **atual,char reg[]){
 
     Campo *campo = NULL;
     Dados *dado = NULL;
@@ -638,7 +638,7 @@ void gotodado(DBF **dbf,char reg[]){
             status = (*dbf)->status;
 
             //percorre a qntd de vezes que o usuario digitou no campo dados
-            for(; i > 0 && dado != NULL; i--){
+            for(; i - 1 > 0 && dado != NULL; i--){
                 dado = dado->prox;
                 status = status->prox;
             }
@@ -648,7 +648,7 @@ void gotodado(DBF **dbf,char reg[]){
             campo = campo->prox;
         }
     }
-    baseRec(recordAtual((*dbf)->status,status),contaRecords((*dbf)->status));
+    baseRec(recordAtual((*dbf)->status,status) + 1,contaRecords((*dbf)->status));
 
 }
 
@@ -668,7 +668,7 @@ void deleteAll(DBF **dbf){
     }
 }
 
-void delete(Status **status){
+void deleteUni(Status **status){
 
     if(*status != NULL && (*status)->boolean){
         (*status)->boolean = 0;
