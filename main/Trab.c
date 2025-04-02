@@ -16,6 +16,7 @@ void extraiAspas(char str[],char str2[]);
 //Funções gerais
 char compare(char str[], char str2[]);
 void strSplit(char str[], char str2[], char del);
+char validaCreate(char str[]);
 
 //Interface Grafica
 #include "GUI.h"
@@ -58,7 +59,6 @@ int main() {
                         baseDBF("");
                         dbf = unid->arqs;
                         aberto = dbf;
-                        mainScreen();
                     }
                 }
             break;
@@ -66,17 +66,20 @@ int main() {
             case 1:
                 //Foi digitado comando que começa com "CREATE"
                 extrairParametro(comando, arg);
-                strSplit(arg, cmd, '.');
-                baseDBF(cmd);
-                baseCmd("CREATE");
-                Create(&unid, &aberto, arg);
-                exibir(&F);
+                if (validaCreate(arg)) {
+                    baseDBF(arg);
+                    baseCmd("CREATE");
+                    Create(&unid, &aberto, arg);
+                    exibir(&F);
+                }
             break;
 
             case 2:
                 //Foi digitado o comando "DIR"
-                Dir(unid, &F);
-                exibir(&F);
+                if (unid != NULL) {
+                    Dir(unid, &F);
+                    exibir(&F);
+                }
             break;
 
             case 3:
@@ -154,7 +157,17 @@ int main() {
     return 0;
 }
 
+char validaCreate(char str[]) {
+    char flag = 1;
 
+    for (int i = 0; str[i] != '\0'; i++) {
+        if (str[i] == ' ') {
+            flag = 0;
+        }
+    }
+
+    return flag;
+}
 
 char validaComando(char str[]) {
     char flag = 0;
