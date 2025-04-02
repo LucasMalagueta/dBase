@@ -28,7 +28,7 @@ char validaCreate(char str[]);
 int main() {
     Unidade *unid = NULL;
     DBF *dbf = NULL, *aberto = NULL;
-
+    Status *atual = NULL;
     char comando[50], cmd[15], arg[15], dado[25];
     char args[4][15];
 
@@ -144,7 +144,18 @@ int main() {
             case 10:
                 //Foi digitado o comando "GOTO"
                 extrairParametros(args, comando);
-                gotodado(&aberto, args[1]);
+                gotodado(&aberto,&atual, args[1]);
+            break;
+
+            case 12:
+                //Foi digitado o comando "DELETE"
+                extrairParametros(args, comando);
+                if(compare(args[1],"ALL")){
+                    deleteAll(&aberto);
+                }else
+                    if(compare(args[1],""))
+                        deleteUni(&atual);
+
             break;
 
             default:
