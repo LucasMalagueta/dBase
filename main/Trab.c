@@ -34,20 +34,14 @@ int main() {
     Fila F; 
     inicializar(&F);
 
-    clrscr();
-    textcolor(CYAN);
-    moldura(3, 1, 88, 23);
-    textcolor(WHITE);
-    instrucoes();
-    base();
-    baseDir(" ");
-    baseField(" ");
+    mainScreen();
 
+    //Loop principal
     do {
         baseCmd("Command Line");
         lerComando(comando);
         strSplit(comando, cmd, ' ');
-        // gotoxy(1, 1);
+        // gotoxy(5, 8);
         // printf("String digitada: %s\n", comando);
         // printf("Comando extraido: %s\n", cmd);
         // printf("Chave do Comando: %d\n", chaveComando(cmd));
@@ -108,11 +102,12 @@ int main() {
                 //Comando tem paramestros alem de LIST
                 else {
                     extrairParametros(args, comando);
-
+                    //LIST STRUCTURE
                     if (compare(args[1], "STRUCTURE")) {
-                        ListStructure(unid, dbf);
+                        ListStructure(unid, aberto, &F);
+                        exibir(&F);
                     }
-                    
+                    //LIST FOR ... = " "
                     else {                        
                         if (compare(args[1], "FOR")) {
                             

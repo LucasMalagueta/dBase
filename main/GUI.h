@@ -8,12 +8,25 @@ void base();
 void baseDir(char*);
 void baseCmd(char*);
 void baseDBF(char*);
-void baseField(char*);
+void baseRec(char*);
 void createCampos();
 void createCampos2();
+void mainScreen();
 void dica1(int x, char str[]);
 void dica2(int x, char str[]);
 void print2(int x, int y, char str[]);
+
+void mainScreen() {
+    clrscr();
+    textcolor(CYAN);
+    moldura(3, 1, 88, 23);
+    textcolor(WHITE);
+    instrucoes();
+    base();
+    baseDir(" ");
+    baseRec("none");
+    dica1(0, "Enter a dBASE III PLUS command");
+}
 
 void print2(int x, int y, char str[]) {
     gotoxy(x, y);
@@ -60,11 +73,13 @@ void baseDBF(char DBF[]) {
     textcolor(LIGHTGRAY); textbackground(BLACK);
 }
 
-void baseField(char field[]) {
+void baseRec(char rec[]) {
+    char str[10];
     textcolor(BLACK); textbackground(LIGHTGRAY);
     limparLinha(52, 67, 20);
     //Linha dbf
-    print2(52, 20, "Field: ");
+    sprintf(str, "Rec: %s", rec);
+    print2(52, 20, str);
     textcolor(LIGHTGRAY); textbackground(BLACK);
 }
 
@@ -169,12 +184,21 @@ void dica1(int x, char str[]) {
     if (x > 0) {
         print2(x, 21, str);
     }
+    if (x == 0) {
+        x = 5 + ((82 - strlen(str)) / 2);
+        print2(x, 21, str);
+    }
 }
 
 void dica2(int x, char str[]) {
     textbackground(BLACK); textcolor(LIGHTGRAY);
     limparLinha(5, 87, 22);
     if (x > 0) {
+        print2(x, 22, str);
+    }
+
+    if (x == 0) {
+        x = 5 + ((82 - strlen(str)) / 2);
         print2(x, 22, str);
     }
 }

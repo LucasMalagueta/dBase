@@ -71,7 +71,8 @@ void quit();
 void USE(DBF **aberto, DBF *atual);
 
 //LIST STRUCTURE
-void ListStructure(Unidade *unid, DBF *dbf);
+void ListStructure(Unidade *unid, DBF *dbf, Fila *F);
+char* returnCH(char ch);
 
 //APPEND
 void Append(DBF **dbf);
@@ -139,9 +140,10 @@ void Create(Unidade **unid, DBF **dbf, char nome[50]) {
         strftime(hr, 11, "%H:%M:%S", tm_info);
         //Preenche o aux com as informaçoes do novo arquivo .DBF
         aux = (DBF *)malloc(sizeof(DBF));
-        strcpy(aux->nomeDBF,nome);
-        strcpy(aux->Data,data);
-        strcpy(aux->Hora,hr);
+        sprintf(nome, "%s.dbf", nome);
+        strcpy(aux->nomeDBF, nome);
+        strcpy(aux->Data, data);
+        strcpy(aux->Hora, hr);
         aux->campos = NULL;
         aux->status = NULL;
 
@@ -299,6 +301,7 @@ int contaRecords(Status *status) {
         }
         aux = aux->prox;
     }
+
     return i;
 }
 
@@ -324,24 +327,49 @@ void USE(DBF **aberto, DBF *atual) {
 }
 
 //6
-void ListStructure(Unidade *unid, DBF *dbf) {
-    Campo *campos = dbf->campos;
-    int i = 1;
+void ListStructure(Unidade *unid, DBF *dbf, Fila *F) {
+    Campo *campos = NULL;
+    int i = 1, soma = 0;
+    char linha[100];
 
-    if(unid !=NULL && unid->arqs !=NULL){
-        printf("Structure for database: %s%s\n",unid->und,dbf->nomeDBF);
-        printf("Number of the data records: \n");
-        printf("Date of the last update: %s\n",dbf->Data);
-        printf("Field      Field Name      Type      Width      Dec\n",dbf->Data);
+    if (dbf != NULL && unid != NULL) {
+        inserir(F, ". LIST STRUCTURE");
+        sprintf(linha, "Structure for database: %s%s", unid->und, dbf->nomeDBF);
+        inserir(F, linha);
+        sprintf(linha, "Number of the data records: %d", contaRecords(dbf->status));
+        inserir(F, linha);
+        sprintf(linha, "Date of the last update: %s", dbf->Data);
+        inserir(F, linha);
 
-        while(campos != NULL){
-            printf("%d      %s      %c      %d      %d\n",i++,campos->FieldName,campos->Type,campos->Width,campos->Dec);
-            campos = campos->prox;
+        campos = dbf->campos;
+        if (campos != NULL) {
+            sprintf(linha, "%-5s  %-15s %-12s %-5s  %-3s", "Field", "Field Name", "Type", "Width", "Dec");
+            inserir(F, linha);
+
+            while(campos != NULL) {
+                sprintf(linha, "%5d  %-15s %-12s %5d  %3d", i++, campos->FieldName, returnCH(campos->Type), campos->Width, campos->Dec);
+                inserir(F, linha);
+                soma += campos->Width;
+                campos = campos->prox;
+            }
+            sprintf(linha, "** Total **%30d", soma);
+            inserir(F, linha);
         }
-    }else{
-        printf("Caminho inexistente!\n");
+    } 
+}
+
+char* returnCH(char ch) {
+    if (ch == 'N') {
+        return "Numeric";
+    } else if (ch == 'D') {
+        return "Date";
+    } else if (ch == 'L') {
+        return "Logical";
+    } else if (ch == 'C') {
+        return "Character";
+    } else if (ch == 'M') {
+        return "Memo";
     }
-    
 }
 
 //7
