@@ -284,7 +284,7 @@ void Dir(Unidade *unid, Fila *F) {
         aux = unid->arqs;
 
         while(aux != NULL) {
-            sprintf(linha, "%s\t\t%d\t\t%s\t%d", aux->nomeDBF, contaRecords(aux->status), aux->Data, 0);
+            sprintf(linha, "%s\t\t%d\t\t%s\t%d", aux->nomeDBF, contaRecords(aux->status), aux->Data, sizeof(*aux));
             inserir(F, linha);
             aux = aux->prox;
         }
@@ -318,7 +318,7 @@ int recordAtual(Status *status, Status *pos){
 
 //4
 void quit() {
-    gotoxy(1, 20);
+    gotoxy(1, 24);
 }
 
 //5
@@ -401,9 +401,11 @@ void Append(DBF **dbf) {
                 nova = (Dados *)malloc(sizeof(Dados));
                 //Popular dados
                 nova->prox = NULL;
-                gotoxy(20, i); 
+                sizeToSpace(20, i, campo->Width);
+                textcolor(BLACK); textbackground(LIGHTGRAY);
                 insere(campo->Type, &nova); //Chama uma captura de input
                 fflush(stdin);
+                textcolor(LIGHTGRAY); textbackground(BLACK);
 
                 //Verificar se o campo tem dados ou se é o primeiro
                 if (campo->Pdados != NULL) {
@@ -485,7 +487,7 @@ void list(DBF *dbf, Fila *F) {
         campo = dbf->campos;
 
         if (campo != NULL) {
-            dado = campo->Patual;
+            dado = campo->Pdados;
 
             if (dado != NULL) {
                 //Guarda comando
@@ -500,12 +502,12 @@ void list(DBF *dbf, Fila *F) {
 
                 //Guardar conteudos
                 i = 1;
-                nivelDado = dbf->campos->Patual;
+                nivelDado = dbf->campos->Pdados;
                 while (nivelDado != NULL) {
                     campo = dbf->campos;
-                    sprintf(linha, "\t%d", i);
+                    sprintf(linha, "%7d", i);
                     while(campo != NULL) {
-                        dado = campo->Patual;
+                        dado = campo->Pdados;
 
                         for(int x = i; x > 1; x--) {
                             dado = dado->prox;

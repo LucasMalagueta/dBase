@@ -12,9 +12,17 @@ void baseRec(int,int);
 void createCampos();
 void createCampos2();
 void mainScreen();
+void sizeToSpace(int x, int y, int z);
 void dica1(int x, char str[]);
 void dica2(int x, char str[]);
 void print2(int x, int y, char str[]);
+
+void sizeToSpace(int x, int y, int z) {
+    textcolor(BLACK); textbackground(LIGHTGRAY);
+    limparLinha(x, x + z, y);
+    gotoxy(x, y);
+    textcolor(LIGHTGRAY); textbackground(BLACK);
+}
 
 void mainScreen() {
     clrscr();
