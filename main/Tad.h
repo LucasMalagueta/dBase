@@ -74,6 +74,12 @@ void USE(DBF **aberto, DBF *atual);
 void ListStructure(Unidade *unid, DBF *dbf, Fila *F);
 char* returnCH(char ch);
 
+//LIST
+void list(DBF *dbf, Fila *F); 
+void listFor(DBF *dbf, char campoA[], char alvo[], Fila *F);
+char compare2(char str[], char str2[]);
+char comparaDados(Dados *dado, char tipo, char alvo[]);
+
 //APPEND
 void Append(DBF **dbf);
 void insere(char T,Dados **nova);
@@ -554,6 +560,137 @@ void list(DBF *dbf, Fila *F) {
             }
         }
     }
+}
+
+void listFor(DBF *dbf, char campoA[], char alvo[], Fila *F) {
+    Campo *campo = NULL;
+    Dados *dado = NULL, *nivelDado = NULL;
+    char linha[100], ch, flag;
+    int i;
+
+    if (dbf != NULL) {
+        campo = dbf->campos;
+
+        if (campo != NULL) {
+            dado = campo->Pdados;
+
+            if (dado != NULL) {
+                //Guarda comando
+                sprintf(linha, "LIST FOR %s = \"%s\"", campoA, alvo);
+                inserir(F, linha);
+                //Guardar titulos
+                sprintf(linha, "%s", "Record#");
+                while(campo != NULL) {
+                    sprintf(linha, "%s\t%s", linha, campo->FieldName);
+                    campo = campo->prox;
+                }
+                inserir(F, linha);
+
+                //Guardar conteudos
+                i = 1;
+                nivelDado = dbf->campos->Pdados;
+                while (nivelDado != NULL) {
+                    //Verificar se o reg atual da match com alvo 
+                    flag = 0;
+                    campo = dbf->campos;
+                    if (campo != NULL) {
+                        //Ir até o campo
+                        while (campo != NULL && !compare(campo->FieldName, campoA)) {
+                            campo = campo->prox;
+                        }
+
+                        if (campo != NULL) {
+                            dado = campo->Pdados;
+                            //Ir até o nivel correto
+                            for(int x = i; x > 1; x--) {
+                                dado = dado->prox;
+                            }
+
+                            //Checar o dado daquela linha da match
+                            if (dado != NULL) {
+                                flag = comparaDados(dado, campo->Type, alvo);
+                            }
+                        }
+                    }
+
+                    if (flag == 1) {
+                        //Resto da logica igual LIST
+                        campo = dbf->campos;
+                        sprintf(linha, "%7d", i);
+                        while(campo != NULL) {
+                            dado = campo->Pdados;
+
+                            for(int x = i; x > 1; x--) {
+                                dado = dado->prox;
+                            }
+        
+                            if (dado != NULL) {
+                                switch (campo->Type) {
+                                    case 'N':
+                                        sprintf(linha, "%s\t%.0f", linha, dado->tipo.valorN);
+                                    break;
+                                    
+                                    case 'D':
+                                        sprintf(linha, "%s\t%s", linha, dado->tipo.valorD);
+                                    break;
+                                    
+                                    case 'L':
+                                        sprintf(linha, "%s\t%c", linha, dado->tipo.valorL);
+                                    break;
+                                    
+                                    case 'C':
+                                        sprintf(linha, "%s\t%s", linha, dado->tipo.valorC);
+                                    break;
+                                    
+                                    case 'M':
+                                        sprintf(linha, "%s\t%s", linha, dado->tipo.valorM);
+                                    break;
+                                }
+        
+                            }
+                            campo = campo->prox;
+                        }
+                        inserir(F, linha);
+                    }
+
+                    i++;
+                    nivelDado = nivelDado->prox; //Nivel dado e i++ ajudam a definir quantos niveis pra baixo 
+                    //é necessario ir para recuperar o reg atual
+                }
+            }
+        }
+    }
+}
+
+char comparaDados(Dados *dado, char tipo, char alvo[]) {
+    char flag = 0;
+
+    switch (tipo) {
+        case 'N':
+            //Converter string alvo para num e comparar
+        break;
+
+        case 'C':
+            if (compare2(alvo, dado->tipo.valorC)) {
+                flag = 1;
+            }
+        break;
+        
+        default:
+            break;
+    }
+
+    return flag;
+}
+
+char compare2(char str[], char str2[]) {
+    char flag = 1;
+    for(int i = 0; str[i] != '\0'; i++) {
+        if (str[i] != str2[i]) {
+            flag = 0;
+        }
+    }
+    return flag;
 }
 
 //9

@@ -112,10 +112,14 @@ int main() {
                         ListStructure(unid, aberto, &F);
                         exibir(&F);
                     }
+
                     //LIST FOR ... = " "
                     else {                        
                         if (compare(args[1], "FOR")) {
-                            
+                            extrairParametros(args, comando);
+                            extraiAspas(comando, arg);
+                            listFor(aberto, args[2], arg, &F);
+                            exibir(&F);
                         }
                     }
                 }
