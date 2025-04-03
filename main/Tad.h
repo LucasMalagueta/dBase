@@ -61,7 +61,7 @@ int verificach(char ch);
 
 //DIR
 void Dir(Unidade *unid, Fila *F);
-int contaRecords(Status *status);
+int contaRecords(DBF *dbf);
 int recordAtual(Status *status, Status *pos);
 
 //QUIT
@@ -157,6 +157,7 @@ void Create(Unidade **unid, DBF **dbf, char nome[50]) {
         //Existe arquivos .dbf
         else{
             //Aponta o ultimo arquivo .DBF para o novo arquivo(aux)
+            *dbf = aux;
             atual = *dbf;
             while(atual ->prox != NULL){
                 atual = atual->prox;
@@ -189,6 +190,7 @@ void Create(Unidade **unid, DBF **dbf, char nome[50]) {
         }
         dica1(0, " ");
         textcolor(LIGHTGRAY); textbackground(BLACK);
+        baseRec(0,0);
     }
 }
 
@@ -285,7 +287,7 @@ void Dir(Unidade *unid, Fila *F) {
         aux = unid->arqs;
 
         while(aux != NULL) {
-            sprintf(linha, "%s\t\t%d\t\t%s\t%d", aux->nomeDBF, contaRecords(aux->status), aux->Data, sizeof(*aux));
+            sprintf(linha, "%s\t\t%d\t\t%s\t%d", aux->nomeDBF, contaRecords(aux), aux->Data, sizeof(*aux));
             inserir(F, linha);
             soma += sizeof(*aux);
             i++;
@@ -298,22 +300,28 @@ void Dir(Unidade *unid, Fila *F) {
     }
 }
 
-int contaRecords(Status *status) {
-    Status *aux = status;
+int contaRecords(DBF *dbf) {
+    Status *aux;
     int i = 0;
 
-    while(aux != NULL) {
+    if(dbf != NULL){
+
+        aux = dbf->status;
+        while(aux != NULL) {
         if(aux->boolean) {
             i++;
         }
         aux = aux->prox;
+        }
+
     }
+    
 
     return i;
 }
 
 int recordAtual(Status *status, Status *pos){
-    int i = 0;
+    int i = 1;
     while (status != NULL) {
         if (status == pos)
             return i;
@@ -343,7 +351,7 @@ void ListStructure(Unidade *unid, DBF *dbf, Fila *F) {
         inserir(F, ". LIST STRUCTURE");
         sprintf(linha, "Structure for database: %s%s", unid->und, dbf->nomeDBF);
         inserir(F, linha);
-        sprintf(linha, "Number of the data records: %d", contaRecords(dbf->status));
+        sprintf(linha, "Number of the data records: %d", contaRecords(dbf));
         inserir(F, linha);
         sprintf(linha, "Date of the last update: %s", dbf->Data);
         inserir(F, linha);
@@ -446,7 +454,7 @@ void Append(DBF **dbf) {
             novastatus->prox = NULL; 
             novastatus->boolean = 1; 
         }
-        baseRec(0,contaRecords((*dbf)->status));
+        baseRec(0,contaRecords((*dbf)));
     }
 }
 
@@ -614,7 +622,7 @@ void locate(DBF **dbf,char Nomecampo[],char Nomedado[]){
                 }
 
                 if(compare(Nomedado,dado->tipo.valorC))
-                    printf("Record = %d",contaRecords((*dbf)->status));
+                    printf("Record = %d",contaRecords((*dbf)));
                 
                 else
                     printf("Registro nao encontrado!");
@@ -634,30 +642,37 @@ void gotodado(DBF **dbf,Status **atual,char reg[]){
     Campo *campo = NULL;
     Dados *dado = NULL;
     Status *status = NULL;
-    int i = atoi(reg);
+    int i;
 
     //verifica se existe campo no .dbf
     if((*dbf)->campos != NULL && (*dbf)->status != NULL){
 
         campo = (*dbf)->campos;
         status = (*dbf)->status;
-        //verifica se o campo e NULL e percorre todos
+        //verifica se o campo é NULL e percorre todos
         while(campo != NULL){
+
             dado = campo->Pdados;
             status = (*dbf)->status;
 
             //percorre a qntd de vezes que o usuario digitou no campo dados
-            for(; i - 1 > 0 && dado != NULL; i--){
-                dado = dado->prox;
-                status = status->prox;
+            for(i = atoi(reg); i - 1 > 0 && dado != NULL; i--){
+                if(status->boolean){
+                    dado = dado->prox;
+                    status = status->prox;
+                }
+                else
+                    i++;
+                
             }
-            if(dado != NULL){
+            if(dado != NULL ){
                 campo->Patual = dado;
+                *atual = status;
             }
             campo = campo->prox;
         }
     }
-    baseRec(recordAtual((*dbf)->status,status) + 1,contaRecords((*dbf)->status));
+    baseRec(recordAtual((*dbf)->status,status),contaRecords(*dbf));
 
 }
 
@@ -674,6 +689,8 @@ void deleteAll(DBF **dbf){
             status->boolean = 0;
             status->prox;
         }
+        printf("sucesso!\n");
+        getchar();
     }
 }
 
@@ -682,4 +699,91 @@ void deleteUni(Status **status){
     if(*status != NULL && (*status)->boolean){
         (*status)->boolean = 0;
     }
+}
+
+void reCall(Status **status){
+
+    if(*status != NULL && !(*status)->boolean){
+        (*status)->boolean = 1;
+    }
+}
+
+void display(DBF *dbf, Status *pos, Fila *F){
+    int i;
+    Campo *campo = NULL;
+    Dados *dado = NULL, *nivelDado = NULL;
+    char linha[100];
+
+    if (dbf != NULL) {
+        campo = dbf->campos;
+
+        if (campo != NULL) {
+            dado = campo->Pdados;
+
+            if (dado != NULL) {
+                //Guarda comando
+                inserir(F, ". DISPLAY");
+                //Guardar titulos
+                sprintf(linha, "%s", "Record#");
+                while(campo != NULL) {
+                    sprintf(linha, "%s\t%s", linha, campo->FieldName);
+                    campo = campo->prox;
+                }
+                inserir(F, linha);
+
+                //Guardar conteudos
+                nivelDado = dbf->campos->Pdados;
+
+
+                i = recordAtual(dbf->status,pos);
+                printf("%d\n",i);
+                getchar();
+                while(i > 1 && nivelDado != NULL){
+                    nivelDado = nivelDado->prox;
+                    i--;
+                }
+
+                if (nivelDado != NULL && pos->boolean){
+                    campo = dbf->campos;
+                    i = recordAtual(dbf->status,pos);
+                    sprintf(linha, "%7d", i);
+                    while(campo != NULL) {
+                        dado = campo->Pdados;
+
+                        for(int x = i; x > 1; x--) {
+                            dado = dado->prox;
+                        }
+    
+                        if (dado != NULL) {
+                            switch (campo->Type) {
+                                case 'N':
+                                    sprintf(linha, "%s\t%.0f", linha, dado->tipo.valorN);
+                                break;
+                                
+                                case 'D':
+                                    sprintf(linha, "%s\t%s", linha, dado->tipo.valorD);
+                                break;
+                                
+                                case 'L':
+                                    sprintf(linha, "%s\t%c", linha, dado->tipo.valorL);
+                                break;
+                                
+                                case 'C':
+                                    sprintf(linha, "%s\t%s", linha, dado->tipo.valorC);
+                                break;
+                                
+                                case 'M':
+                                    sprintf(linha, "%s\t%s", linha, dado->tipo.valorM);
+                                break;
+                            }
+    
+                        }
+                        campo = campo->prox;
+                    }
+                    inserir(F, linha);
+                }
+            }
+        }
+    }
+    
 }
