@@ -59,6 +59,7 @@ int main() {
                         baseDBF("");
                         dbf = unid->arqs;
                         aberto = dbf;
+                        baseRec(0,0);
                     }
                 }
             break;
@@ -95,6 +96,7 @@ int main() {
                 if (buscaDBF(arg, dbf) != NULL) {
                     USE(&aberto, buscaDBF(arg, dbf));
                     baseDBF(arg);
+                    baseRec(0,contaRecords(aberto));
                 }
             break;
 
@@ -137,6 +139,13 @@ int main() {
                 clear(&F);
             break;
 
+            case 8:
+                //Foi digitado o comando "DISPLAY"
+                clear(&F);
+                display(aberto,atual,&F);
+                clear(&F);
+            break;
+
             case 9:
                 extrairParametros(args, comando);
                 //"LOCATE FOR..."
@@ -157,6 +166,7 @@ int main() {
                 extrairParametros(args, comando);
                 if(compare(args[1],"ALL")){
                     deleteAll(&aberto);
+
                 }else
                     if(compare(args[1],""))
                         deleteUni(&atual);
