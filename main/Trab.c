@@ -67,12 +67,12 @@ int main() {
             case 1:
                 //Foi digitado comando que começa com "CREATE"
                 extrairParametro(comando, arg);
-                if (validaCreate(arg)) {
+                if (validaCreate(arg) && unid != NULL) {
                     baseDBF(arg);
                     baseCmd("CREATE");
                     clear(&F);
                     Create(&unid, &aberto, arg);
-                    exibir(&F);
+                    clear(&F);
                 }
             break;
 
@@ -93,11 +93,14 @@ int main() {
                 //Foi digitado o comando "USE"
                 extrairParametro(comando, arg);
 
-                if (buscaDBF(arg, dbf) != NULL) {
-                    USE(&aberto, buscaDBF(arg, dbf));
-                    baseDBF(arg);
+                sprintf(arg, "%s.dbf", arg);
+                if (buscaDBF(arg, aberto) != NULL) {
+                    USE(&aberto, buscaDBF(arg, aberto));
+                    strSplit(arg, cmd, ".");
+                    baseDBF(cmd);
                     baseRec(0,contaRecords(aberto));
                 }
+
             break;
 
             case 5:
@@ -141,9 +144,8 @@ int main() {
 
             case 8:
                 //Foi digitado o comando "DISPLAY"
-                clear(&F);
                 display(aberto,atual,&F);
-                clear(&F);
+                exibir(&F);
             break;
 
             case 9:
