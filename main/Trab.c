@@ -27,7 +27,7 @@ char validaCreate(char str[]);
 
 int main() {
     Unidade *unid = NULL;
-    DBF *dbf = NULL, *aberto = NULL;
+    DBF *aberto = NULL;
     Status *atual = NULL;
     char comando[50], cmd[15], arg[15], dado[25];
     char args[4][15];
@@ -40,6 +40,7 @@ int main() {
     //Loop principal
     do {
         baseCmd("Command Line");
+        dica1(0, "Enter a dBASE III PLUS command");
         lerComando(comando);
         strSplit(comando, cmd, ' ');
         // gotoxy(5, 8);
@@ -56,9 +57,12 @@ int main() {
                     if (compare(args[3], "C:") || compare(args[3], "D:")) {
                         setDefaltTo(&unid, args[3]);
                         baseDir(unid->und);
+                        aberto = unid->arqs;
                         baseDBF("");
-                        dbf = unid->arqs;
-                        aberto = dbf;
+                        if (aberto != NULL) {
+                            strSplit(aberto->nomeDBF, cmd, '.');
+                            baseDBF(cmd);
+                        }
                         baseRec(0,0);
                     }
                 }
@@ -92,11 +96,11 @@ int main() {
             case 4:
                 //Foi digitado o comando "USE"
                 extrairParametro(comando, arg);
-
-                sprintf(arg, "%s.dbf", arg);
+                sprintf(arg, "%s.DBF", arg);
+                
                 if (buscaDBF(arg, aberto) != NULL) {
                     USE(&aberto, buscaDBF(arg, aberto));
-                    strSplit(arg, cmd, ".");
+                    strSplit(arg, cmd, '.');
                     baseDBF(cmd);
                     baseRec(0,contaRecords(aberto));
                 }

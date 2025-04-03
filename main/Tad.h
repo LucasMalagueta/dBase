@@ -177,7 +177,7 @@ void Create(Unidade **unid, DBF **dbf, char nome[50]) {
         strftime(hr, 11, "%H:%M:%S", tm_info);
         //Preenche o aux com as informaçoes do novo arquivo .DBF
         aux = (DBF *)malloc(sizeof(DBF));
-        sprintf(nome, "%s.dbf", nome);
+        sprintf(nome, "%s.DBF", nome);
         strcpy(aux->nomeDBF, nome);
         strcpy(aux->Data, data);
         strcpy(aux->Hora, hr);
@@ -205,7 +205,7 @@ void Create(Unidade **unid, DBF **dbf, char nome[50]) {
 
         *dbf = aux;
         //Criar campos
-        dica1(25, "[ENTER] Criar Campo. [Esc] encerrar CREATE");
+        dica1(0, "[Qualquer tecla] Criar Campo. [Esc] encerrar CREATE.");
         gotoxy(7, 19);
         op = getch();
         createCampos();
@@ -213,20 +213,36 @@ void Create(Unidade **unid, DBF **dbf, char nome[50]) {
         //Iniciar loop campos
         textcolor(BLACK); textbackground(LIGHTGRAY);
         while (op != 27) {
-            dica1(0, " ");
+            //Condição de impresão segunda parte
+            if (y >= 18) {
+                createCampos2();
+                x = 52;
+                y = 10;
+            }
+
             //lOGICA DE CADASTRAR CAMPOS
+            dica1(0, " ");
             exibelinhacampo(&x, &y, &count);
             cadastraCampo(&aux, &x, &y);
             y++;
 
-            dica1(25, "[ENTER] Criar Campo. [Esc] encerrar CREATE");
-            gotoxy(7, 19);
-            op = getch();
-            fflush(stdin);
+            //Condição de parada if positivo
+            if (x == 52 && y >= 18) {
+                dica1(0, "[Qualquer tecla]Encerrar CREATE.");
+                dica2(0, "Campos lotados!");
+                gotoxy(7, 19);
+                op = getch();
+                op = 27;
+            } else {
+                dica1(0, "[Qualquer tecla]Criar Campo. [Esc] encerrar CREATE.");
+                gotoxy(7, 19);
+                op = getch();
+                fflush(stdin);
+            }
         }
         dica1(0, " ");
+        dica2(0, " ");
         textcolor(LIGHTGRAY); textbackground(BLACK);
-        
     }
 }
 
@@ -300,7 +316,11 @@ void exibelinhacampo(int *x, int *y, int *count) {
     gotoxy(*x, *y);
     //Exibir numero do campo
     textcolor(LIGHTGRAY); textbackground(BLACK); 
-    printf("%d  ", ++(*count));
+    if (*count < 9) {
+        printf("%d  ", ++(*count));
+    } else {
+        printf("%d ", ++(*count));
+    }
     textcolor(BLACK); textbackground(LIGHTGRAY);
     //Exibir barras de preenchimento
     printf("          ");
