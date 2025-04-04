@@ -82,7 +82,7 @@ char comparaDados(Dados *dado, char tipo, char alvo[]);
 
 //APPEND
 void Append(DBF **dbf);
-void insere(char T,Dados **nova);
+void insere(Campo* campo, Dados **nova, int x, int y);
 
 //CLEAR
 void clear();
@@ -267,11 +267,23 @@ void cadastraCampo(DBF **dbf, int *x, int *y) {
         novo->Type = ch;
         printCH(ch);
 
-        gotoxy(*x + 26, *y);
-        scanf("%d", &novo->Width);
-
-        gotoxy(*x + 31, *y);
-        scanf("%d", &novo->Dec);
+        if (ch == 'L') {
+            gotoxy(*x + 26, *y);
+            printf("1");
+            novo->Width = 1;
+        } else {
+            gotoxy(*x + 26, *y);
+            scanf("%d", &novo->Width);
+        }
+        
+        if (ch == 'N') {
+            gotoxy(*x + 31, *y);
+            scanf("%d", &novo->Dec);
+        } else {
+            gotoxy(*x + 31, *y);
+            printf("0");
+            novo->Dec = 0;
+        }
 
         novo->prox = NULL;
         novo->Patual = NULL;
@@ -474,7 +486,7 @@ void Append(DBF **dbf) {
                 nova->prox = NULL;
                 sizeToSpace(20, i, campo->Width);
                 textcolor(BLACK); textbackground(LIGHTGRAY);
-                insere(campo->Type, &nova); //Chama uma captura de input
+                insere(campo, &nova, 20, i); //Chama uma captura de input
                 fflush(stdin);
                 textcolor(LIGHTGRAY); textbackground(BLACK);
 
@@ -514,36 +526,68 @@ void Append(DBF **dbf) {
     }
 }
 
-void insere(char T, Dados **nova) {
+void insere(Campo* campo, Dados **nova, int x, int y) {
     char str[50];
+    char T = campo->Type, ch;
 
-    switch (T){
-    case 'N':
-        scanf("%f", &(*nova)->tipo.valorN);
+    switch (T) {
+        case 'N':
+            scanf("%f", &(*nova)->tipo.valorN);
         break;
-    
-    case 'D':
-        gets((*nova)->tipo.valorD);
+        
+        case 'D':
+            //Loop para respeitar o tamanho do campo
+            do {
+                sizeToSpace(x, y, campo->Width);
+                textcolor(BLACK); textbackground(LIGHTGRAY);
+                gets(str);
+                textcolor(LIGHTGRAY); textbackground(BLACK);
+            } while (strlen(str) > campo->Width);
+
+            strcpy((*nova)->tipo.valorD, str);
         break;
-    
-    case 'L':
-        (*nova)->tipo.valorL = getch();
+        
+        case 'L':
+            //Loop para garantir que é uma das opçoes corretas
+            do {
+                sizeToSpace(x, y, campo->Width);
+                textcolor(BLACK); textbackground(LIGHTGRAY);
+                ch = toupper(getch());
+                fflush(stdin);
+            } while(verificach(ch));
+            (*nova)->tipo.valorL = ch;
+            printCH(ch);
+            textcolor(LIGHTGRAY); textbackground(BLACK);
         break;
-    
-    case 'C':
-        gets(str);
-        (*nova)->tipo.valorC = (char *)malloc(strlen(str)+1);
-        strcpy((*nova)->tipo.valorC, str);
+        
+        case 'C':
+            //Loop para respeitar o tamanho do campo
+            do {
+                sizeToSpace(x, y, campo->Width);
+                textcolor(BLACK); textbackground(LIGHTGRAY);
+                gets(str);
+                textcolor(LIGHTGRAY); textbackground(BLACK);
+            } while (strlen(str) > campo->Width);
+
+            (*nova)->tipo.valorC = (char *)malloc(strlen(str)+1);
+            strcpy((*nova)->tipo.valorC, str);
         break;
-    
-    case 'M':
-        gets(str);
-        (*nova)->tipo.valorM = (char *)malloc(strlen(str)+1);
-        strcpy((*nova)->tipo.valorM, str);
+        
+        case 'M':
+            //Loop para respeitar o tamanho do campo
+            do {
+                sizeToSpace(x, y, campo->Width);
+                textcolor(BLACK); textbackground(LIGHTGRAY);
+                gets(str);
+                textcolor(LIGHTGRAY); textbackground(BLACK);
+            } while (strlen(str) > campo->Width);
+
+            (*nova)->tipo.valorM = (char *)malloc(strlen(str)+1);
+            strcpy((*nova)->tipo.valorM, str);
         break;
-    
-    default:
-        break;
+        
+        default:
+            break;
     }
 }
 
@@ -552,7 +596,7 @@ void list(DBF *dbf, Fila *F) {
     Campo *campo = NULL;
     Dados *dado = NULL, *nivelDado = NULL;
     char linha[100], ch;
-    int i;
+    int i, size;
 
     if (dbf != NULL) {
         campo = dbf->campos;
@@ -566,7 +610,9 @@ void list(DBF *dbf, Fila *F) {
                 //Guardar titulos
                 sprintf(linha, "%s", "Record#");
                 while(campo != NULL) {
-                    sprintf(linha, "%s\t%s", linha, campo->FieldName);
+                    //Size serve exclusivamente para logical
+                    size = (campo->Width == 1) ? 10 : campo->Width;
+                    sprintf(linha, "%s %-*s", linha, size, campo->FieldName);
                     campo = campo->prox;
                 }
                 inserir(F, linha);
@@ -587,23 +633,23 @@ void list(DBF *dbf, Fila *F) {
                         if (dado != NULL) {
                             switch (campo->Type) {
                                 case 'N':
-                                    sprintf(linha, "%s\t%.0f", linha, dado->tipo.valorN);
+                                    sprintf(linha, "%s %-*.*f", linha, campo->Width, campo->Dec, dado->tipo.valorN);
                                 break;
                                 
                                 case 'D':
-                                    sprintf(linha, "%s\t%s", linha, dado->tipo.valorD);
+                                    sprintf(linha, "%s %-*s", linha, campo->Width, dado->tipo.valorD);
                                 break;
                                 
                                 case 'L':
-                                    sprintf(linha, "%s\t%c", linha, dado->tipo.valorL);
+                                    sprintf(linha, "%s %-*s", linha, 10, returnCH(dado->tipo.valorL));
                                 break;
                                 
                                 case 'C':
-                                    sprintf(linha, "%s\t%s", linha, dado->tipo.valorC);
+                                    sprintf(linha, "%s %-*s", linha, campo->Width, dado->tipo.valorC);
                                 break;
                                 
                                 case 'M':
-                                    sprintf(linha, "%s\t%s", linha, dado->tipo.valorM);
+                                    sprintf(linha, "%s %-*s", linha, campo->Width, dado->tipo.valorM);
                                 break;
                             }
     
