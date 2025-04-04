@@ -9,6 +9,7 @@ void baseDir(char*);
 void baseCmd(char*);
 void baseDBF(char*);
 void baseRec(int,int);
+void baseField(int,int);
 void createCampos();
 void createCampos2();
 void mainScreen();
@@ -57,7 +58,7 @@ void base() {
 
 void baseCmd(char cmd[]) {
     textcolor(BLACK); textbackground(LIGHTGRAY);
-    limparLinha(5, 20, 20);
+    limparLinha(5, 21, 20);
     //Linha de comando
     print2(5, 20, cmd);
     textcolor(LIGHTGRAY); textbackground(BLACK);
@@ -85,8 +86,20 @@ void baseRec(int qtd,int total) {
     char str[10];
     textcolor(BLACK); textbackground(LIGHTGRAY);
     limparLinha(52, 67, 20);
-    //Linha dbf
-    sprintf(str, "Rec: %d/%d", qtd, total);
+    if (qtd == 0 && total == 0) {
+        print2(52, 20, "Rec: None");
+    } else {
+        sprintf(str, "Rec: %d/%d", qtd, total);
+        print2(52, 20, str);
+    }
+    textcolor(LIGHTGRAY); textbackground(BLACK);
+}
+
+void baseField(int qtd, int total) {
+    char str[10];
+    textcolor(BLACK); textbackground(LIGHTGRAY);
+    limparLinha(52, 67, 20);
+    sprintf(str, "Field: %d/%d", qtd, total);
     print2(52, 20, str);
     textcolor(LIGHTGRAY); textbackground(BLACK);
 }

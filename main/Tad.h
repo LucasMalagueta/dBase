@@ -54,10 +54,11 @@ void setDefaltTo(Unidade **unid, char dir[3]);
 
 //CREATE
 void Create(Unidade **unid, DBF **dbf, char nome[50]);
-void cadastraCampo(DBF **dbf, int *x, int *y);
+void cadastraCampo(DBF **dbf, int x, int y);
 void exibelinhacampo();
 void printCH(char ch);
 int verificach(char ch);
+int contaCampos(DBF *dbf);
 
 //DIR
 void Dir(Unidade *unid, Fila *F);
@@ -112,6 +113,9 @@ void reCall(Status **status);
 //ZAP
 
 //MODIFY STRUCTURE
+void modifyStrucutre(DBF **dbf);
+void exibelinhacampo2(int x, int y, int count, Campo *campo);
+void alteraCampo(Campo **campo, int x, int y);
 
 //SORT
 
@@ -163,7 +167,7 @@ void setDefaltTo(Unidade **unid, char dir[3]) {
 void Create(Unidade **unid, DBF **dbf, char nome[50]) {
     DBF *aux, *atual = NULL;
     char data[11], hr[9], op, ch;
-    int x = 7, y = 10, count = 0;
+    int x = 7, y = 10, count = 1;
 
     time_t t = time(NULL);
     struct tm *tm_info = localtime(&t);
@@ -205,7 +209,7 @@ void Create(Unidade **unid, DBF **dbf, char nome[50]) {
 
         *dbf = aux;
         //Criar campos
-        dica1(0, "[Qualquer tecla] Criar Campo. [Esc] encerrar CREATE.");
+        dica1(0, "[SPACE] Criar Campo. [Esc] encerrar CREATE.");
         gotoxy(7, 19);
         op = getch();
         createCampos();
@@ -221,32 +225,48 @@ void Create(Unidade **unid, DBF **dbf, char nome[50]) {
             }
 
             //lOGICA DE CADASTRAR CAMPOS
-            dica1(0, " ");
-            exibelinhacampo(&x, &y, &count);
-            cadastraCampo(&aux, &x, &y);
+            baseField(count, contaCampos(aux) + 1); //GUI
+            exibelinhacampo(x, y, count); //GUI
+            cadastraCampo(&aux, x, y);
+            exibelinhacampo2(x, y, count, aux->campos); //GUI
+            count++;
             y++;
 
             //Condição de parada if positivo
             if (x == 52 && y >= 18) {
-                dica1(0, "[Qualquer tecla]Encerrar CREATE.");
+                dica1(0, "[SPACE]Encerrar CREATE.");
                 dica2(0, "Campos lotados!");
                 gotoxy(7, 19);
                 op = getch();
                 op = 27;
             } else {
-                dica1(0, "[Qualquer tecla]Criar Campo. [Esc] encerrar CREATE.");
+                dica1(0, "[SPACE]Criar Campo. [Esc] encerrar CREATE.");
                 gotoxy(7, 19);
                 op = getch();
                 fflush(stdin);
             }
         }
-        dica1(0, " ");
-        dica2(0, " ");
         textcolor(LIGHTGRAY); textbackground(BLACK);
     }
 }
 
-void cadastraCampo(DBF **dbf, int *x, int *y) {
+int contaCampos(DBF *dbf) {
+    Campo *aux;
+    int i = 0;
+
+    if(dbf != NULL){
+        aux = dbf->campos;
+
+        while(aux != NULL) {
+            i++;
+            aux = aux->prox;
+        }
+    }
+    
+    return i;
+}
+
+void cadastraCampo(DBF **dbf, int x, int y) {
     Campo *atual = NULL, *novo = NULL; // Cria um ponteiro auxiliar para percorrer a lista
     char ch;
     int autentico;
@@ -254,12 +274,12 @@ void cadastraCampo(DBF **dbf, int *x, int *y) {
     //Checar se o DBF existe
     if (*dbf != NULL) {
         novo = (Campo *)malloc(sizeof(Campo));
-        gotoxy(*x + 3, *y);
+        gotoxy(x + 3, y);
 
         scanf("%s", novo->FieldName);
         fflush(stdin);
 
-        gotoxy(*x + 15, *y);
+        gotoxy(x + 15, y);
         do{
             ch = toupper(getch());
             autentico = verificach(ch);
@@ -268,19 +288,19 @@ void cadastraCampo(DBF **dbf, int *x, int *y) {
         printCH(ch);
 
         if (ch == 'L') {
-            gotoxy(*x + 26, *y);
+            gotoxy(x + 26, y);
             printf("1");
             novo->Width = 1;
         } else {
-            gotoxy(*x + 26, *y);
+            gotoxy(x + 26, y);
             scanf("%d", &novo->Width);
         }
         
         if (ch == 'N') {
-            gotoxy(*x + 31, *y);
+            gotoxy(x + 31, y);
             scanf("%d", &novo->Dec);
         } else {
-            gotoxy(*x + 31, *y);
+            gotoxy(x + 31, y);
             printf("0");
             novo->Dec = 0;
         }
@@ -324,22 +344,22 @@ void printCH(char ch) {
     }
 }
 
-void exibelinhacampo(int *x, int *y, int *count) {
-    gotoxy(*x, *y);
+void exibelinhacampo(int x, int y, int count) {
+    gotoxy(x, y);
     //Exibir numero do campo
     textcolor(LIGHTGRAY); textbackground(BLACK); 
-    if (*count < 9) {
-        printf("%d  ", ++(*count));
+    if (count < 9) {
+        printf("%d  ", count);
     } else {
-        printf("%d ", ++(*count));
+        printf("%d ", count);
     }
     textcolor(BLACK); textbackground(LIGHTGRAY);
     //Exibir barras de preenchimento
     printf("          ");
-    print2(*x+15, *y, "         ");
-    print2(*x+26, *y, "   ");
-    print2(*x+31, *y, "   ");
-    gotoxy(*x+3, *y);
+    print2(x+15, y, "         ");
+    print2(x+26, y, "   ");
+    print2(x+31, y, "   ");
+    gotoxy(x+3, y);
 }
 
 //3
@@ -1078,5 +1098,136 @@ void reCall(Status **status){
 
     if(*status != NULL && !(*status)->boolean){
         (*status)->boolean = 1;
+    }
+}
+
+//19
+void modifyStrucutre(DBF **dbf) {
+    Campo *campo = NULL;
+    char op;
+    int x = 7, y = 10, count = 1;
+
+    if (*dbf != NULL) {
+        campo = (*dbf)->campos;
+        if(campo != NULL) {
+
+            createCampos();
+            //Pergunta se quer alterar ou nao
+            do {
+                exibelinhacampo2(x, y, count, campo);
+                dica1(0, "ALTERAR CAMPOS");
+                dica2(0, "[1] Alterar Campo. [SPACE] Proximo campo.");
+                baseField(count, contaCampos(*dbf) + 1);
+                gotoxy(7, 19);
+                op = getch();
+                fflush(stdin);
+                if (op == '1') {
+                    exibelinhacampo(x, y, count);
+                    alteraCampo(&campo, x, y);
+                    exibelinhacampo2(x, y, count, campo);
+                }
+                count++;
+                y++;
+                campo = campo->prox;    
+            } while (campo != NULL);
+
+            //Pergunta se quer adicionar ou nao
+            //Criar campos
+            dica1(0, "ADICIONAR CAMPOS");
+            dica2(0, "[SPACE] Criar Campo. [Esc] encerrar MODIFY STRUCTURE.");
+            gotoxy(7, 19);
+            op = getch();
+            createCampos();
+            fflush(stdin);
+            //Iniciar loop campos
+            textcolor(BLACK); textbackground(LIGHTGRAY);
+            while (op != 27) {
+                //Condição de impresão segunda parte
+                if (y >= 18) {
+                    createCampos2();
+                    x = 52;
+                    y = 10;
+                }
+
+                //lOGICA DE CADASTRAR CAMPOS
+                baseField(count, contaCampos(*dbf) + 1);
+                exibelinhacampo(x, y, count);
+                cadastraCampo(&(*dbf), x, y);
+                exibelinhacampo2(x, y, count, (*dbf)->campos);
+                count++;
+                y++;
+
+                //Condição de parada if positivo
+                if (x == 52 && y >= 18) {
+                    dica1(0, "[SPACE]Encerrar CREATE.");
+                    dica2(0, "Campos lotados!");
+                    gotoxy(7, 19);
+                    op = getch();
+                    op = 27;
+                } else {
+                    dica1(0, "[SPACE]Criar Campo. [Esc] encerrar CREATE.");
+                    gotoxy(7, 19);
+                    op = getch();
+                    fflush(stdin);
+                }
+            }
+            textcolor(LIGHTGRAY); textbackground(BLACK);
+        }
+    }
+}
+
+void exibelinhacampo2(int x, int y, int count, Campo *campo) {
+    textcolor(LIGHTGRAY); textbackground(BLACK);
+    limparLinha(x, x + 34, y);
+    gotoxy(x, y);
+    //Exibir numero do campo
+    if (count < 9) {
+        printf("%d  ", count);
+    } else {
+        printf("%d ", count);
+    }
+
+    //Exibir conteudo
+    printf("%s", campo->FieldName);
+    gotoxy(x + 15, y); printf("%s", returnCH(campo->Type));
+    gotoxy(x + 26, y); printf("%d", campo->Width);
+    gotoxy(x + 31, y); printf("%d", campo->Dec);
+    gotoxy(x + 3, y);
+}
+
+void alteraCampo(Campo **campo, int x, int y) {
+    char str[50];
+    char ch;
+    int autentico;
+
+    gotoxy(x + 3, y);
+
+    scanf("%s", (*campo)->FieldName);
+    fflush(stdin);
+
+    gotoxy(x + 15, y);
+    do {
+        ch = toupper(getch());
+        autentico = verificach(ch);
+    } while(autentico);
+    (*campo)->Type = ch;
+    printCH(ch);
+
+    if (ch == 'L') {
+        gotoxy(x + 26, y);
+        printf("1");
+        (*campo)->Width = 1;
+    } else {
+        gotoxy(x + 26, y);
+        scanf("%d", &(*campo)->Width);
+    }
+        
+    if (ch == 'N') {
+        gotoxy(x + 31, y);
+        scanf("%d", &(*campo)->Dec);
+    } else {
+        gotoxy(x + 31, y);
+        printf("0");
+        (*campo)->Dec = 0;
     }
 }

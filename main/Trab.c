@@ -41,6 +41,8 @@ int main() {
     do {
         baseCmd("Command Line");
         dica1(0, "Enter a dBASE III PLUS command");
+        dica2(0, "");
+        baseRec(0, contaRecords(aberto));
         lerComando(comando);
         strSplit(comando, cmd, ' ');
         // gotoxy(5, 8);
@@ -177,6 +179,17 @@ int main() {
                     if(compare(args[1],""))
                         deleteUni(&atual);
 
+            break;
+
+            case 16:
+                //Foi digitado comando que começa com "MODIFY"
+                extrairParametro(comando, arg);
+                if (compare(arg, "STRUCTURE")) {
+                    clear(&F);
+                    baseCmd("MODIFY STRUCTURE");
+                    modifyStrucutre(&aberto);
+                    clear(&F);
+                }
             break;
 
             default:
