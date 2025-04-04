@@ -42,7 +42,6 @@ int main() {
         baseCmd("Command Line");
         dica1(0, "Enter a dBASE III PLUS command");
         dica2(0, "");
-        baseRec(0, contaRecords(aberto));
         lerComando(comando);
         strSplit(comando, cmd, ' ');
         // gotoxy(5, 8);
@@ -137,48 +136,51 @@ int main() {
             break;
             
             case 6:
-                //Foi digitado o comando "CLEAR"
+                //Foi digitado o comando "APPEND"
+                clear(&F);
+                Append(&aberto,&atual);
                 clear(&F);
             break;
 
             case 7:
-                //Foi digitado o comando "APPEND"
-                clear(&F);
-                Append(&aberto);
+                //Foi digitado o comando "CLEAR"
                 clear(&F);
             break;
 
             case 8:
-                //Foi digitado o comando "DISPLAY"
-                display(aberto,atual,&F);
-                exibir(&F);
-            break;
-
-            case 9:
                 extrairParametros(args, comando);
                 //"LOCATE FOR..."
                 if (compare(args[1], "FOR")) {
                     extraiAspas(comando,dado);
                     locate(&aberto, args[2],dado);
                 }
+                
             break;
 
-            case 10:
+            case 9:
                 //Foi digitado o comando "GOTO"
                 extrairParametros(args, comando);
                 gotodado(&aberto,&atual, args[1]);
+            break;
+
+            case 10:
+                //Foi digitado o comando "DISPLAY"
+                display(aberto,atual,&F);
+                exibir(&F);
             break;
 
             case 12:
                 //Foi digitado o comando "DELETE"
                 extrairParametros(args, comando);
                 if(compare(args[1],"ALL")){
-                    deleteAll(&aberto);
+                    deleteAll(&aberto,&atual);
 
                 }else
-                    if(compare(args[1],""))
-                        deleteUni(&atual);
+                    deleteUni(&aberto,&atual);
+            break;
 
+            case 13:
+                //Foi digitado o comando "RECALL"
             break;
 
             case 16:
@@ -216,8 +218,8 @@ char validaCreate(char str[]) {
 
 char validaComando(char str[]) {
     char flag = 0;
-    char mat[18][20] = {"SET", "CREATE", "DIR", "QUIT", "USE", "LIST", "CLEAR",
-                        "APPEND", "DISPLAY", "LOCATE", "GOTO", "EDIT", "DELETE",
+    char mat[18][20] = {"SET", "CREATE", "DIR", "QUIT", "USE", "LIST", "APPEND",
+                        "CLEAR","LOCATE" ,"GOTO" , "DISPLAY", "EDIT", "DELETE",
                         "RECALL", "PACK", "ZAP", "MODIFY", "SORT"};
 
     for (int i = 0; i < 18; i++) {
@@ -256,9 +258,9 @@ void lerComando(char str[]) {
 
 int chaveComando(char str[]) {
     char flag = 0;
-    char mat[18][20] = {"SET", "CREATE", "DIR", "QUIT", "USE", "LIST", "CLEAR",
-                        "APPEND", "DISPLAY", "LOCATE", "GOTO", "EDIT", "DELETE", "RECALL", "PACK", "ZAP", 
-                        "MODIFY", "SORT"};
+    char mat[18][20] = {"SET", "CREATE", "DIR", "QUIT", "USE", "LIST", "APPEND",
+                        "CLEAR","LOCATE" ,"GOTO" , "DISPLAY", "EDIT", "DELETE",
+                        "RECALL", "PACK", "ZAP", "MODIFY", "SORT"};
 
     for (int i = 0; i < 18; i++) {
         if (strcmp(str, mat[i]) == 0) {

@@ -82,7 +82,7 @@ char compare2(char str[], char str2[]);
 char comparaDados(Dados *dado, char tipo, char alvo[]);
 
 //APPEND
-void Append(DBF **dbf);
+void Append(DBF **dbf, Status **pos);
 void insere(Campo* campo, Dados **nova, int x, int y);
 
 //CLEAR
@@ -100,8 +100,8 @@ void display(DBF *dbf, Status *pos, Fila *F);
 //EDIT
 
 //DELETE
-void deleteUni(Status **status);
-void deleteAll(DBF **dbf);
+void deleteUni(DBF **dbf, Status **status);
+void deleteAll(DBF **dbf, Status **status);
 
 //RECALL
 void reCall(Status **status);
@@ -396,10 +396,11 @@ int contaRecords(DBF *dbf) {
 
         aux = dbf->status;
         while(aux != NULL) {
-        if(aux->boolean) {
-            i++;
-        }
-        aux = aux->prox;
+
+            if(aux->boolean) {
+                i++;
+            }
+            aux = aux->prox;
         }
 
     }
@@ -410,12 +411,19 @@ int contaRecords(DBF *dbf) {
 
 int recordAtual(Status *status, Status *pos){
     int i = 1;
+    
     while (status != NULL) {
-        if (status == pos)
-            return i;
-        status = status->prox; // Avança na lista
-        i++;
+        if(status->boolean){
+            if (status == pos){
+                return i;
+            }
+            // Só altera a pos se nao estiver excluido
+            i++;
+        }
+        // Avança na lista
+        status = status->prox;
     }
+
     return -1;
 }
 
@@ -476,7 +484,7 @@ char* returnCH(char ch) {
 }
 
 //7
-void Append(DBF **dbf) {
+void Append(DBF **dbf, Status **pos) {
     Campo *campo = NULL;
     Status *status = NULL, *novastatus = NULL;
     Dados *dados = NULL, *nova = NULL;
@@ -537,6 +545,7 @@ void Append(DBF **dbf) {
                 status->prox = novastatus;
             } else {
                 (*dbf)->status = novastatus;
+                (*pos) = novastatus;
             }
             //preenche e liga a nova caixa status
             novastatus->prox = NULL; 
@@ -896,12 +905,12 @@ void gotodado(DBF **dbf,Status **atual,char reg[]){
     int i;
 
     //verifica se existe campo no .dbf
-    if((*dbf)->campos != NULL && (*dbf)->status != NULL){
+    if((*dbf) != NULL){
 
         campo = (*dbf)->campos;
         status = (*dbf)->status;
         //verifica se o campo é NULL e percorre todos
-        while(campo != NULL){
+        while(campo != NULL && status != NULL){
 
             dado = campo->Pdados;
             status = (*dbf)->status;
@@ -1028,14 +1037,13 @@ void display(DBF *dbf, Status *pos, Fila *F){
                 }
                 inserir(F, linha);
 
-
+                
                 campo = dbf->campos;
                 i = recordAtual(dbf->status, pos);
                 sprintf(linha, "%7d", i);
-
-                while(campo != NULL) {
+                
+                while(campo != NULL && pos != NULL) {
                     nivelDado = campo->Patual;
-
                     if (nivelDado != NULL && pos->boolean) {
                         switch (campo->Type) {
                             case 'N':
@@ -1060,6 +1068,7 @@ void display(DBF *dbf, Status *pos, Fila *F){
                         }
 
                     }
+                    
                     campo = campo->prox;
                     
                 }
@@ -1071,24 +1080,55 @@ void display(DBF *dbf, Status *pos, Fila *F){
 }
 
 //14
-void deleteUni(Status **status){
+void deleteUni(DBF **dbf, Status **status){
+    Campo *campos = NULL;
+    Status *auxSt = NULL;
 
-    if(*status != NULL && (*status)->boolean){
-        (*status)->boolean = 0;
+    if((*dbf) != NULL){
+
+        campos = (*dbf)->campos;
+        auxSt = (*dbf)->status;
+
+        if(auxSt != NULL && auxSt->boolean){
+
+            auxSt->boolean = 0;
+            baseRec(0,contaRecords(*dbf));
+            // Status atual recebe a cabeça da lista de status
+            auxSt = (*dbf)->status;
+        }
+        // Patual de todos os campos recebe a cabeça da lista de dados
+        while(campos != NULL){
+            campos->Patual = campos->Pdados;
+            campos = campos->prox;
+        }
     }
 }
 
-void deleteAll(DBF **dbf){
+void deleteAll(DBF **dbf, Status **status){
 
-    Status *status = NULL;
-
+    Status *auxSt = NULL;
+    Campo *campos = NULL;
+    
     if((*dbf)->status != NULL){
-        status = (*dbf)->status;
+        auxSt = (*dbf)->status;
+        campos = (*dbf)->campos;
 
-        while(status != NULL && status->boolean){
+        while(auxSt != NULL){
 
-            status->boolean = 0;
-            status->prox;
+            if(auxSt->boolean){
+                auxSt->boolean = 0;
+            }
+            auxSt = auxSt->prox;
+        }
+        baseRec(0,contaRecords(*dbf));
+
+        // Status atual recebe a cabeça da lista de status
+        (*status) = (*dbf)->status;
+
+        // Patual de todos os campos recebe a cabeça da lista de dados
+        while(campos != NULL){
+            campos->Patual = campos->Pdados;
+            campos = campos->prox;
         }
     }
 }
