@@ -54,7 +54,7 @@ void setDefaltTo(Unidade **unid, char dir[3]);
 
 //CREATE
 void Create(Unidade **unid, DBF **dbf, char nome[50]);
-void cadastraCampo(DBF **dbf, int x, int y);
+Campo * cadastraCampo(DBF **dbf, int x, int y);
 void exibelinhacampo();
 void printCH(char ch);
 int verificach(char ch);
@@ -166,6 +166,7 @@ void setDefaltTo(Unidade **unid, char dir[3]) {
 //2
 void Create(Unidade **unid, DBF **dbf, char nome[50]) {
     DBF *aux, *atual = NULL;
+    Campo *exibir;
     char data[11], hr[9], op, ch;
     int x = 7, y = 10, count = 1;
 
@@ -227,8 +228,8 @@ void Create(Unidade **unid, DBF **dbf, char nome[50]) {
             //lOGICA DE CADASTRAR CAMPOS
             baseField(count, contaCampos(aux) + 1); //GUI
             exibelinhacampo(x, y, count); //GUI
-            cadastraCampo(&aux, x, y);
-            exibelinhacampo2(x, y, count, aux->campos); //GUI
+            exibir = cadastraCampo(&aux, x, y);
+            exibelinhacampo2(x, y, count, exibir); //GUI
             count++;
             y++;
 
@@ -266,39 +267,70 @@ int contaCampos(DBF *dbf) {
     return i;
 }
 
-void cadastraCampo(DBF **dbf, int x, int y) {
-    Campo *atual = NULL, *novo = NULL; // Cria um ponteiro auxiliar para percorrer a lista
+//Retorna numeros, alfabeto e Enter
+char leChar() {
     char ch;
+
+    do {
+        ch = getche();
+        fflush(stdin);
+    } while ((ch < 48 && ch > 57) || (ch < 65 && ch > 90) || (ch < 97 && ch > 122) || (ch > 13 && ch < 13));
+
+    return ch;
+}
+
+Campo *cadastraCampo(DBF **dbf, int x, int y) {
+    Campo *atual = NULL, *novo = NULL; // Cria um ponteiro auxiliar para percorrer a lista
+    char ch, tipo;
     int autentico;
+    Strdin *S;
+    inicializarSdin(&S);
 
     //Checar se o DBF existe
     if (*dbf != NULL) {
         novo = (Campo *)malloc(sizeof(Campo));
         gotoxy(x + 3, y);
 
-        scanf("%s", novo->FieldName);
-        fflush(stdin);
+        // scanf("%s", novo->FieldName);
+        // fflush(stdin);
+        do {
+            ch = leChar();
+            inserirSdin(&S, ch);
+        } while (tamanhoSdin(S) < 10 && ch != 13);
+        strcpy(novo->FieldName, converteStrdin(S));
+        reiniciarSdin(&S);
 
         gotoxy(x + 15, y);
-        do{
-            ch = toupper(getch());
-            autentico = verificach(ch);
-        }while(autentico);
-        novo->Type = ch;
-        printCH(ch);
+        do {
+            tipo = toupper(getch());
+        } while(verificach(tipo));
+        novo->Type = tipo;
+        printCH(tipo);
 
-        if (ch == 'L') {
+        if (tipo == 'L') {
             gotoxy(x + 26, y);
             printf("1");
             novo->Width = 1;
         } else {
             gotoxy(x + 26, y);
-            scanf("%d", &novo->Width);
+            // scanf("%d", &novo->Width);
+            do {
+                ch = leChar();
+                inserirSdin(&S, ch);
+            } while (tamanhoSdin(S) < 3 && ch != 13);
+            novo->Width = atoi(converteStrdin(S));
+            reiniciarSdin(&S);
         }
         
-        if (ch == 'N') {
+        if (tipo == 'N') {
             gotoxy(x + 31, y);
-            scanf("%d", &novo->Dec);
+            //scanf("%d", &novo->Dec);
+            do {
+                ch = leChar();
+                inserirSdin(&S, ch);
+            } while (tamanhoSdin(S) < 3 && ch != 13);
+            novo->Dec = atoi(converteStrdin(S));
+            reiniciarSdin(&S);
         } else {
             gotoxy(x + 31, y);
             printf("0");
@@ -308,7 +340,6 @@ void cadastraCampo(DBF **dbf, int x, int y) {
         novo->prox = NULL;
         novo->Patual = NULL;
         novo->Pdados = NULL;
-
 
         atual = (*dbf)->campos;
         //Checar se o DBF tem campos cadastrados. Caso sim atual != NULL
@@ -324,6 +355,7 @@ void cadastraCampo(DBF **dbf, int x, int y) {
         }
     }
 
+    return novo;
 }
 
 int verificach(char ch){
@@ -558,28 +590,38 @@ void Append(DBF **dbf, Status **pos) {
 void insere(Campo* campo, Dados **nova, int x, int y) {
     char str[50];
     char T = campo->Type, ch;
+    Strdin *S;
+    inicializarSdin(&S);
 
     switch (T) {
         case 'N':
-            scanf("%f", &(*nova)->tipo.valorN);
+            do {
+                ch = leChar();
+                inserirSdin(&S, ch);
+            } while (tamanhoSdin(S) < campo->Width && ch != 13);
+
+            (*nova)->tipo.valorN = (float)atof(converteStrdin(S));
+            reiniciarSdin(&S);
         break;
         
         case 'D':
             //Loop para respeitar o tamanho do campo
+            sizeToSpace(x, y, campo->Width);
             do {
-                sizeToSpace(x, y, campo->Width);
                 textcolor(BLACK); textbackground(LIGHTGRAY);
-                gets(str);
+                ch = leChar();
+                inserirSdin(&S, ch);
                 textcolor(LIGHTGRAY); textbackground(BLACK);
-            } while (strlen(str) > campo->Width);
+            } while (tamanhoSdin(S) < campo->Width && ch != 13);
 
-            strcpy((*nova)->tipo.valorD, str);
+            strcpy((*nova)->tipo.valorD, converteStrdin(S));
+            reiniciarSdin(&S);
         break;
         
         case 'L':
             //Loop para garantir que é uma das opçoes corretas
+            sizeToSpace(x, y, campo->Width);
             do {
-                sizeToSpace(x, y, campo->Width);
                 textcolor(BLACK); textbackground(LIGHTGRAY);
                 ch = toupper(getch());
                 fflush(stdin);
@@ -591,15 +633,17 @@ void insere(Campo* campo, Dados **nova, int x, int y) {
         
         case 'C':
             //Loop para respeitar o tamanho do campo
+            sizeToSpace(x, y, campo->Width);
             do {
-                sizeToSpace(x, y, campo->Width);
                 textcolor(BLACK); textbackground(LIGHTGRAY);
-                gets(str);
+                ch = leChar();
+                inserirSdin(&S, ch);
                 textcolor(LIGHTGRAY); textbackground(BLACK);
-            } while (strlen(str) > campo->Width);
+            } while (tamanhoSdin(S) < campo->Width && ch != 13);
 
             (*nova)->tipo.valorC = (char *)malloc(strlen(str)+1);
-            strcpy((*nova)->tipo.valorC, str);
+            strcpy((*nova)->tipo.valorC, converteStrdin(S));
+            reiniciarSdin(&S);
         break;
         
         case 'M':
@@ -607,12 +651,14 @@ void insere(Campo* campo, Dados **nova, int x, int y) {
             do {
                 sizeToSpace(x, y, campo->Width);
                 textcolor(BLACK); textbackground(LIGHTGRAY);
-                gets(str);
+                ch = leChar();
+                inserirSdin(&S, ch);
                 textcolor(LIGHTGRAY); textbackground(BLACK);
-            } while (strlen(str) > campo->Width);
+            } while (tamanhoSdin(S) < campo->Width && ch != 13);
 
             (*nova)->tipo.valorM = (char *)malloc(strlen(str)+1);
-            strcpy((*nova)->tipo.valorM, str);
+            strcpy((*nova)->tipo.valorM, converteStrdin(S));
+            reiniciarSdin(&S);
         break;
         
         default:
@@ -699,7 +745,7 @@ void listFor(DBF *dbf, char campoA[], char alvo[], Fila *F) {
     Campo *campo = NULL;
     Dados *dado = NULL, *nivelDado = NULL;
     char linha[100], ch, flag;
-    int i;
+    int i, size;
 
     if (dbf != NULL) {
         campo = dbf->campos;
@@ -714,7 +760,8 @@ void listFor(DBF *dbf, char campoA[], char alvo[], Fila *F) {
                 //Guardar titulos
                 sprintf(linha, "%s", "Record#");
                 while(campo != NULL) {
-                    sprintf(linha, "%s\t%s", linha, campo->FieldName);
+                    size = (campo->Width == 1) ? 10 : campo->Width;
+                    sprintf(linha, "%s %-*s", linha, size, campo->FieldName);
                     campo = campo->prox;
                 }
                 inserir(F, linha);
@@ -760,23 +807,23 @@ void listFor(DBF *dbf, char campoA[], char alvo[], Fila *F) {
                             if (dado != NULL) {
                                 switch (campo->Type) {
                                     case 'N':
-                                        sprintf(linha, "%s\t%.0f", linha, dado->tipo.valorN);
+                                        sprintf(linha, "%s %-*.*f", linha, campo->Width, campo->Dec, dado->tipo.valorN);
                                     break;
                                     
                                     case 'D':
-                                        sprintf(linha, "%s\t%s", linha, dado->tipo.valorD);
+                                        sprintf(linha, "%s %-*s", linha, campo->Width, dado->tipo.valorD);
                                     break;
                                     
                                     case 'L':
-                                        sprintf(linha, "%s\t%c", linha, dado->tipo.valorL);
+                                        sprintf(linha, "%s %-*s", linha, 10, returnCH(dado->tipo.valorL));
                                     break;
                                     
                                     case 'C':
-                                        sprintf(linha, "%s\t%s", linha, dado->tipo.valorC);
+                                        sprintf(linha, "%s %-*s", linha, campo->Width, dado->tipo.valorC);
                                     break;
                                     
                                     case 'M':
-                                        sprintf(linha, "%s\t%s", linha, dado->tipo.valorM);
+                                        sprintf(linha, "%s %-*s", linha, campo->Width, dado->tipo.valorM);
                                     break;
                                 }
         
@@ -1143,7 +1190,7 @@ void reCall(Status **status){
 
 //19
 void modifyStrucutre(DBF **dbf) {
-    Campo *campo = NULL;
+    Campo *campo = NULL, *exibir;
     char op;
     int x = 7, y = 10, count = 1;
 
@@ -1174,7 +1221,7 @@ void modifyStrucutre(DBF **dbf) {
             //Pergunta se quer adicionar ou nao
             //Criar campos
             dica1(0, "ADICIONAR CAMPOS");
-            dica2(0, "[SPACE] Criar Campo. [Esc] encerrar MODIFY STRUCTURE.");
+            dica2(0, "[1] Criar Campo. [Esc] encerrar MODIFY STRUCTURE.");
             gotoxy(7, 19);
             op = getch();
             createCampos();
@@ -1192,8 +1239,8 @@ void modifyStrucutre(DBF **dbf) {
                 //lOGICA DE CADASTRAR CAMPOS
                 baseField(count, contaCampos(*dbf) + 1);
                 exibelinhacampo(x, y, count);
-                cadastraCampo(&(*dbf), x, y);
-                exibelinhacampo2(x, y, count, (*dbf)->campos);
+                exibir = cadastraCampo(&(*dbf), x, y);
+                exibelinhacampo2(x, y, count, exibir);
                 count++;
                 y++;
 
@@ -1203,9 +1250,11 @@ void modifyStrucutre(DBF **dbf) {
                     dica2(0, "Campos lotados!");
                     gotoxy(7, 19);
                     op = getch();
+                    fflush(stdin);
                     op = 27;
                 } else {
-                    dica1(0, "[SPACE]Criar Campo. [Esc] encerrar CREATE.");
+                    dica1(0, "ADICIONAR CAMPOS");
+                    dica2(0, "[1] Criar Campo. [Esc] encerrar MODIFY STRUCTURE.");
                     gotoxy(7, 19);
                     op = getch();
                     fflush(stdin);

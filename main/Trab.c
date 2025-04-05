@@ -22,6 +22,8 @@ char validaCreate(char str[]);
 #include "GUI.h"
 //Fila de impressão
 #include "Fila.h"
+//Capturar strings um caracter por vez dinamicamente
+#include "Strdin.h"
 //Funções principais e relacionados
 #include "Tad.h"
 
