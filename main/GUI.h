@@ -10,6 +10,7 @@ void baseCmd(char*);
 void baseDBF(char*);
 void baseRec(int,int);
 void baseField(int,int);
+void baseNum();
 void createCampos();
 void createCampos2();
 void mainScreen();
@@ -34,6 +35,7 @@ void mainScreen() {
     base();
     baseDir(" ");
     baseRec(0, 0);
+    baseNum();
     dica1(0, "Enter a dBASE III PLUS command");
 }
 
@@ -101,6 +103,13 @@ void baseField(int qtd, int total) {
     limparLinha(52, 67, 20);
     sprintf(str, "Field: %d/%d", qtd, total);
     print2(52, 20, str);
+    textcolor(LIGHTGRAY); textbackground(BLACK);
+}
+
+void baseNum() {
+    textcolor(BLACK); textbackground(LIGHTGRAY);
+    limparLinha(79, 86, 20);
+    print2(79, 20, "Num");
     textcolor(LIGHTGRAY); textbackground(BLACK);
 }
 

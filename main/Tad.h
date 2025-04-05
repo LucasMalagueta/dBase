@@ -54,7 +54,7 @@ void setDefaltTo(Unidade **unid, char dir[3]);
 
 //CREATE
 void Create(Unidade **unid, DBF **dbf, char nome[50]);
-Campo * cadastraCampo(DBF **dbf, int x, int y);
+Campo *cadastraCampo(DBF **dbf, int x, int y);
 void exibelinhacampo();
 void printCH(char ch);
 int verificach(char ch);
@@ -82,6 +82,7 @@ void list(DBF *dbf, Fila *F);
 void listFor(DBF *dbf, char campoA[], char alvo[], Fila *F);
 char compare2(char str[], char str2[]);
 char comparaDados(Dados *dado, char tipo, char alvo[]);
+void extraiDado(Campo *campo, Dados *dado, char *linha);
 
 //APPEND
 void Append(DBF **dbf, Status **pos);
@@ -751,28 +752,7 @@ void list(DBF *dbf, Fila *F) {
                         }
     
                         if (dado != NULL) {
-                            switch (campo->Type) {
-                                case 'N':
-                                    sprintf(linha, "%s %-*.*f", linha, campo->Width, campo->Dec, dado->tipo.valorN);
-                                break;
-                                
-                                case 'D':
-                                    sprintf(linha, "%s %-*s", linha, campo->Width, dado->tipo.valorD);
-                                break;
-                                
-                                case 'L':
-                                    sprintf(linha, "%s %-*s", linha, 10, returnCH(dado->tipo.valorL));
-                                break;
-                                
-                                case 'C':
-                                    sprintf(linha, "%s %-*s", linha, campo->Width, dado->tipo.valorC);
-                                break;
-                                
-                                case 'M':
-                                    sprintf(linha, "%s %-*s", linha, campo->Width, dado->tipo.valorM);
-                                break;
-                            }
-    
+                            extraiDado(campo, dado, linha);
                         }
                         campo = campo->prox;
                     }
@@ -783,6 +763,30 @@ void list(DBF *dbf, Fila *F) {
                 }
             }
         }
+    }
+}
+
+void extraiDado(Campo *campo, Dados *dado, char *linha) {
+    switch (campo->Type) {
+        case 'N':
+            sprintf(linha, "%s %-*.*f", linha, campo->Width, campo->Dec, dado->tipo.valorN);
+        break;
+        
+        case 'D':
+            sprintf(linha, "%s %-*s", linha, campo->Width, dado->tipo.valorD);
+        break;
+        
+        case 'L':
+            sprintf(linha, "%s %-*s", linha, 10, returnCH(dado->tipo.valorL));
+        break;
+        
+        case 'C':
+            sprintf(linha, "%s %-*s", linha, campo->Width, dado->tipo.valorC);
+        break;
+        
+        case 'M':
+            sprintf(linha, "%s %-*s", linha, campo->Width, dado->tipo.valorM);
+        break;
     }
 }
 
@@ -850,28 +854,7 @@ void listFor(DBF *dbf, char campoA[], char alvo[], Fila *F) {
                             }
         
                             if (dado != NULL) {
-                                switch (campo->Type) {
-                                    case 'N':
-                                        sprintf(linha, "%s %-*.*f", linha, campo->Width, campo->Dec, dado->tipo.valorN);
-                                    break;
-                                    
-                                    case 'D':
-                                        sprintf(linha, "%s %-*s", linha, campo->Width, dado->tipo.valorD);
-                                    break;
-                                    
-                                    case 'L':
-                                        sprintf(linha, "%s %-*s", linha, 10, returnCH(dado->tipo.valorL));
-                                    break;
-                                    
-                                    case 'C':
-                                        sprintf(linha, "%s %-*s", linha, campo->Width, dado->tipo.valorC);
-                                    break;
-                                    
-                                    case 'M':
-                                        sprintf(linha, "%s %-*s", linha, campo->Width, dado->tipo.valorM);
-                                    break;
-                                }
-        
+                                extraiDado(campo, dado, linha);        
                             }
                             campo = campo->prox;
                         }
@@ -1073,85 +1056,8 @@ void gotodado(DBF **dbf,Status **atual,char reg[]){
 }
 
 //12
-// void display(DBF *dbf, Status *pos, Fila *F){
-//     int i;
-//     Campo *campo = NULL;
-//     Dados *dado = NULL, *nivelDado = NULL;
-//     char linha[100];
-
-//     if (dbf != NULL) {
-//         campo = dbf->campos;
-
-//         if (campo != NULL) {
-//             dado = campo->Pdados;
-
-//             if (dado != NULL) {
-//                 //Guarda comando
-//                 inserir(F, ". DISPLAY");
-//                 //Guardar titulos
-//                 sprintf(linha, "%s", "Record#");
-//                 while(campo != NULL) {
-//                     sprintf(linha, "%s\t%s", linha, campo->FieldName);
-//                     campo = campo->prox;
-//                 }
-//                 inserir(F, linha);
-
-//                 //Guardar conteudos
-//                 nivelDado = dbf->campos->Pdados;
-//                 i = recordAtual(dbf->status, pos);
-
-//                 while(i > 1 && nivelDado != NULL){
-//                     nivelDado = nivelDado->prox;
-//                     i--;
-//                 }
-
-//                 if (nivelDado != NULL && pos->boolean){
-//                     campo = dbf->campos;
-//                     i = recordAtual(dbf->status, pos);
-//                     sprintf(linha, "%7d", i);
-//                     while(campo != NULL) {
-//                         dado = campo->Pdados;
-
-//                         for(int x = i; x > 1; x--) {
-//                             dado = dado->prox;
-//                         }
-    
-//                         if (dado != NULL) {
-//                             switch (campo->Type) {
-//                                 case 'N':
-//                                     sprintf(linha, "%s\t%.0f", linha, dado->tipo.valorN);
-//                                 break;
-                                
-//                                 case 'D':
-//                                     sprintf(linha, "%s\t%s", linha, dado->tipo.valorD);
-//                                 break;
-                                
-//                                 case 'L':
-//                                     sprintf(linha, "%s\t%c", linha, dado->tipo.valorL);
-//                                 break;
-                                
-//                                 case 'C':
-//                                     sprintf(linha, "%s\t%s", linha, dado->tipo.valorC);
-//                                 break;
-                                
-//                                 case 'M':
-//                                     sprintf(linha, "%s\t%s", linha, dado->tipo.valorM);
-//                                 break;
-//                             }
-    
-//                         }
-//                         campo = campo->prox;
-//                     }
-//                     inserir(F, linha);
-//                 }
-//             }
-//         }
-//     }
-    
-// }
-
 void display(DBF *dbf, Status *pos, Fila *F){
-    int i;
+    int i, size;
     Campo *campo = NULL;
     Dados *nivelDado = NULL;
     char linha[100];
@@ -1168,11 +1074,11 @@ void display(DBF *dbf, Status *pos, Fila *F){
                 //Guardar titulos
                 sprintf(linha, "%s", "Record#");
                 while(campo != NULL) {
-                    sprintf(linha, "%s\t%s", linha, campo->FieldName);
+                    size = (campo->Width == 1) ? 10 : campo->Width;
+                    sprintf(linha, "%s %-*s", linha, size, campo->FieldName);
                     campo = campo->prox;
                 }
                 inserir(F, linha);
-
                 
                 campo = dbf->campos;
                 i = recordAtual(dbf->status, pos);
@@ -1180,29 +1086,9 @@ void display(DBF *dbf, Status *pos, Fila *F){
                 
                 while(campo != NULL && pos != NULL) {
                     nivelDado = campo->Patual;
-                    if (nivelDado != NULL && pos->boolean) {
-                        switch (campo->Type) {
-                            case 'N':
-                                sprintf(linha, "%s\t%.0f", linha, nivelDado->tipo.valorN);
-                            break;
-                            
-                            case 'D':
-                                sprintf(linha, "%s\t%s", linha, nivelDado->tipo.valorD);
-                            break;
-                            
-                            case 'L':
-                                sprintf(linha, "%s\t%c", linha, nivelDado->tipo.valorL);
-                            break;
-                            
-                            case 'C':
-                                sprintf(linha, "%s\t%s", linha, nivelDado->tipo.valorC);
-                            break;
-                            
-                            case 'M':
-                                sprintf(linha, "%s\t%s", linha, nivelDado->tipo.valorM);
-                            break;
-                        }
 
+                    if (nivelDado != NULL && pos->boolean) {
+                        extraiDado(campo, nivelDado, linha);
                     }
                     
                     campo = campo->prox;
