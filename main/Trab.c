@@ -31,7 +31,7 @@ int main() {
     Unidade *unid = NULL;
     DBF *aberto = NULL;
     Status *atual = NULL;
-    char comando[50], cmd[15], arg[15], dado[25];
+    char comando[50], cmd[15], arg[15], dado[60];
     char args[4][15];
 
     Fila F; 
@@ -42,8 +42,8 @@ int main() {
     //Loop principal
     do {
         baseCmd("Command Line");
-        dica1(0, "Enter a dBASE III PLUS command");
-        dica2(0, "");
+        dica1(0, "");
+        dica2(0, "Enter a dBASE III PLUS command");
         lerComando(comando);
         strSplit(comando, cmd, ' ');
         // gotoxy(5, 8);
@@ -152,9 +152,14 @@ int main() {
             case 8:
                 extrairParametros(args, comando);
                 //"LOCATE FOR..."
+                //LOCATE FOR MEMO ACIMA DE 35 CARACTERES NAO FUNCIONA, 
+                // RESOLVER DEPOIS
+                //aZqWeRtYuIoPlKjHgFdScVbNmXxCcVvBbN
+                //aZqWeRtYuIoPlKjHgFdScVbNmXxCcVvBbNnMmLlKkJjHhGgFf
                 if (compare(args[1], "FOR")) {
-                    extraiAspas(comando,dado);
-                    locate(&aberto, args[2],dado);
+                    extraiAspas(comando, dado);
+                    locate(&aberto, args[2], dado, &F);
+                    exibir(&F);
                 }
                 
             break;
