@@ -116,6 +116,8 @@ void reCall(Status **status);
 //PACK
 
 //ZAP
+void zap(DBF **dbf);
+void freeDado(Campo *campo, Dados *ant);
 
 //MODIFY STRUCTURE
 void modifyStrucutre(DBF **dbf);
@@ -723,9 +725,6 @@ void insere(Campo* campo, Dados **nova, int x, int y) {
             strcpy((*nova)->tipo.valorM, converteStrdin(S));
             reiniciarSdin(&S);
         break;
-        
-        default:
-            break;
     }
 }
 
@@ -1224,6 +1223,61 @@ void reCall(Status **status){
     }
 }
 
+//18
+void zap(DBF **dbf) {
+    Campo *campo, *antCampo;
+    Dados *dado, *antDado;
+    Status *status, *antStatus;
+
+    if ((*dbf) != NULL) {
+        campo = (*dbf)->campos;
+        status = (*dbf)->status;
+
+        //Exclui dados
+        if(campo != NULL) {
+            while(campo != NULL) {
+                dado = campo->Pdados;
+                campo->Patual = NULL;
+                campo->Pdados = NULL;
+
+                while (dado != NULL) {
+                    antDado = dado;
+                    dado = dado->prox;
+                    freeDado(campo, antDado);
+                }
+
+                campo = campo->prox;
+            }
+        }
+        //Exclui status
+        if (status != NULL) {
+            while (status != NULL) {
+                antStatus = status;
+                status = status->prox;
+                free(antStatus);
+            }
+            (*dbf)->status = NULL;
+        }
+    }
+}
+
+void freeDado(Campo *campo, Dados *ant) {
+    switch (campo->Type) {
+        case 'M':
+            free(ant->tipo.valorM);
+            ant->tipo.valorM = NULL;
+        break;
+
+        case 'C':
+            free(ant->tipo.valorC);
+            ant->tipo.valorC = NULL;
+        break;
+    }
+
+    free(ant);    
+    ant = NULL;
+}
+
 //19
 void modifyStrucutre(DBF **dbf) {
     Campo *campo = NULL, *exibir;
@@ -1246,7 +1300,7 @@ void modifyStrucutre(DBF **dbf) {
                 fflush(stdin);
                 if (op == '1') {
                     exibelinhacampo(x, y, count);
-                    alteraCampo(&campo, x, y);
+                    alteraCampo(&campo, x, y);  
                     exibelinhacampo2(x, y, count, campo);
                 }
                 count++;
@@ -1321,38 +1375,81 @@ void exibelinhacampo2(int x, int y, int count, Campo *campo) {
 }
 
 void alteraCampo(Campo **campo, int x, int y) {
-    char str[50];
-    char ch;
+    char ch, tipo;
     int autentico;
+    Strdin *S;
+    inicializarSdin(&S);
 
-    gotoxy(x + 3, y);
+    if (*campo != NULL) {
+        gotoxy(x + 3, y);
 
-    scanf("%s", (*campo)->FieldName);
-    fflush(stdin);
+        do {
+            ch = leChar();
+            inserirSdin(&S, ch);
+        } while (tamanhoSdin(S) < 10 && ch != 13);
+        strcpy((*campo)->FieldName, converteStrdin(S));
+        reiniciarSdin(&S);
 
-    gotoxy(x + 15, y);
-    do {
-        ch = toupper(getch());
-        autentico = verificach(ch);
-    } while(autentico);
-    (*campo)->Type = ch;
-    printCH(ch);
+        gotoxy(x + 15, y);
+        do {
+            tipo = toupper(getch());
+        } while(verificach(tipo));
+        (*campo)->Type = tipo;
+        printCH(tipo);
 
-    if (ch == 'L') {
-        gotoxy(x + 26, y);
-        printf("1");
-        (*campo)->Width = 1;
-    } else {
-        gotoxy(x + 26, y);
-        scanf("%d", &(*campo)->Width);
-    }
+        //Tipo logico é char, só 1 de tamanho
+        if (tipo == 'L') {
+            gotoxy(x + 26, y);
+            printf("1");
+            (*campo)->Width = 1;
+        } 
+        else {
+            //Tipo memo é 50 de tamanho
+            if (tipo == 'M') {
+                gotoxy(x + 26, y);
+                printf("50");
+                (*campo)->Width = 50;
+            }
+            else {
+                //Tipo date é 10 de tamanho
+                if (tipo == 'D') {
+                    gotoxy(x + 26, y);
+                    printf("10");
+                    (*campo)->Width = 10;
+                } 
+                else {
+                    do {
+                        reiniciarSdin(&S);
+                        print2(x + 26, y, "   ");
+                        gotoxy(x + 26, y);
+                        do {
+                            ch = leNum();
+                            inserirSdin(&S, ch);
+                        } while (tamanhoSdin(S) < 2 && ch != 13);
+                    } while (atoi(converteStrdin(S)) > 50);
+                    (*campo)->Width = atoi(converteStrdin(S));
+                    reiniciarSdin(&S);
+                }
+            }
+        }
         
-    if (ch == 'N') {
-        gotoxy(x + 31, y);
-        scanf("%d", &(*campo)->Dec);
-    } else {
-        gotoxy(x + 31, y);
-        printf("0");
-        (*campo)->Dec = 0;
+        if (tipo == 'N') {
+            //scanf("%d", &novo->Dec);
+            do {
+                reiniciarSdin(&S);
+                print2(x + 31, y, "   ");
+                gotoxy(x + 31, y);
+                do {
+                    ch = leNum();
+                    inserirSdin(&S, ch);
+                } while (tamanhoSdin(S) < 1);
+            } while (atoi(converteStrdin(S)) > 7);
+            (*campo)->Dec = atoi(converteStrdin(S));
+            reiniciarSdin(&S);
+        } else {
+            gotoxy(x + 31, y);
+            printf("0");
+            (*campo)->Dec = 0;
+        }
     }
 }

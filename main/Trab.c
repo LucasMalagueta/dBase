@@ -206,17 +206,27 @@ int main() {
                 //Foi digitado o comando "RECALL"
             break;
 
+            case 15:
+                //Foi digitado o comando "ZAP"
+                zap(&aberto);
+            break;
+            
             case 16:
-                //Foi digitado comando que começa com "MODIFY"
-                extrairParametro(comando, arg);
-                if (compare(arg, "STRUCTURE")) {
-                    clear(&F);
-                    baseCmd("MODIFY STRUCTURE");
-                    modifyStrucutre(&aberto);
-                    clear(&F);
-                }
+            //Foi digitado comando que começa com "MODIFY"
+            extrairParametro(comando, arg);
+            if (compare(arg, "STRUCTURE")) {
+                clear(&F);
+                baseCmd("MODIFY STRUCTURE");
+                modifyStrucutre(&aberto);
+                clear(&F);
+            }
             break;
 
+            case 17:
+                //Foi digitado o comando "SORT"
+                
+            break;
+            
             default:
                 //print2(7, 19, "Opcao invalida.\n");
             break;
