@@ -31,7 +31,7 @@ int main() {
     Unidade *unid = NULL;
     DBF *aberto = NULL;
     Status *atual = NULL;
-    char comando[50], cmd[15], arg[15], dado[60];
+    char comando[50], cmd[15], arg[15], aspas[60];
     char args[4][15];
 
     Fila F; 
@@ -41,9 +41,12 @@ int main() {
 
     //Loop principal
     do {
-        baseCmd("Command Line");
         dica1(0, "");
         dica2(0, "Enter a dBASE III PLUS command");
+        baseCmd("Command Line");
+        if (existeDados(aberto)) {
+            baseRec(1, contaRecords(aberto));
+        }
         lerComando(comando);
         strSplit(comando, cmd, ' ');
         // gotoxy(5, 8);
@@ -59,14 +62,19 @@ int main() {
                 if (compare(args[1], "DEFAULT") && compare(args[2], "TO")) {
                     if (compare(args[3], "C:") || compare(args[3], "D:")) {
                         setDefaltTo(&unid, args[3]);
-                        baseDir(unid->und);
                         aberto = unid->arqs;
+                        
                         baseDBF("");
+                        baseDir(unid->und);
                         if (aberto != NULL) {
                             strSplit(aberto->nomeDBF, cmd, '.');
                             baseDBF(cmd);
                         }
-                        baseRec(0,0);
+                        if (existeDados(aberto)) {
+                            baseRec(1, contaRecords(aberto));
+                        } else {
+                            baseRec(0, 0);
+                        }
                     }
                 }
             break;
@@ -105,7 +113,7 @@ int main() {
                     USE(&aberto, buscaDBF(arg, aberto));
                     strSplit(arg, cmd, '.');
                     baseDBF(cmd);
-                    baseRec(0,contaRecords(aberto));
+                    baseRec(1, contaRecords(aberto));
                 }
 
             break;
@@ -157,8 +165,8 @@ int main() {
                 //aZqWeRtYuIoPlKjHgFdScVbNmXxCcVvBbN
                 //aZqWeRtYuIoPlKjHgFdScVbNmXxCcVvBbNnMmLlKkJjHhGgFf
                 if (compare(args[1], "FOR")) {
-                    extraiAspas(comando, dado);
-                    locate(&aberto, args[2], dado, &F);
+                    extraiAspas(comando, aspas);
+                    locate(&aberto, args[2], aspas, &F);
                     exibir(&F);
                 }
                 
@@ -167,13 +175,21 @@ int main() {
             case 9:
                 //Foi digitado o comando "GOTO"
                 extrairParametros(args, comando);
-                gotodado(&aberto,&atual, args[1]);
+                gotodado(&aberto, &atual, args[1]);
             break;
 
             case 10:
                 //Foi digitado o comando "DISPLAY"
-                display(aberto,atual,&F);
+                display(aberto, atual, &F);
                 exibir(&F);
+            break;
+
+            case 11:
+                //Foi digitado o comando "EDIT"
+                clear(&F);
+                baseCmd("EDIT");
+                edit(&aberto, &atual);
+                clear(&F);
             break;
 
             case 12:

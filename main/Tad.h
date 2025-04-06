@@ -101,6 +101,8 @@ void gotodado(DBF **dbf,Status **atual,char reg[]);
 void display(DBF *dbf, Status *pos, Fila *F);
 
 //EDIT
+void edit(DBF **dbf, Status **atual);
+void exibeTitulosCampos(Campo *campo);
 
 //DELETE
 void deleteUni(DBF **dbf, Status **status);
@@ -125,6 +127,7 @@ void alteraCampo(Campo **campo, int x, int y);
 
 //Demais funções
 DBF* buscaDBF(char str[], DBF *dbf);
+char existeDados(DBF *aberto);
 
 //1
 void setDefaltTo(Unidade **unid, char dir[3]) {
@@ -175,14 +178,12 @@ void Create(Unidade **unid, DBF **dbf, char nome[50]) {
 
     time_t t = time(NULL);
     struct tm *tm_info = localtime(&t);
+    strftime(data, 11, "%d/%m/%Y", tm_info);
+    strftime(hr, 11, "%H:%M:%S", tm_info);
     
     //Verificar se a unidade existe
     if (*unid != NULL) {
-        //baseRec(0,0);
         //Criar DBF
-
-        strftime(data, 11, "%d/%m/%Y", tm_info);
-        strftime(hr, 11, "%H:%M:%S", tm_info);
         //Preenche o aux com as informaçoes do novo arquivo .DBF
         aux = (DBF *)malloc(sizeof(DBF));
         sprintf(nome, "%s.DBF", nome);
@@ -483,8 +484,24 @@ int contaRecords(DBF *dbf) {
 
     }
     
-
     return i;
+}
+
+char existeDados(DBF *aberto) {
+    Campo *campo = NULL;
+    Dados *dado = NULL;
+
+    if (aberto != NULL) {
+        campo = aberto->campos;
+        if (campo != NULL) {
+            dado = campo->Pdados;
+            if (dado != NULL) {
+                return 1;
+            }
+        }
+    }
+
+    return 0;
 }
 
 int recordAtual(Status *status, Status *pos){
@@ -629,7 +646,7 @@ void Append(DBF **dbf, Status **pos) {
             novastatus->prox = NULL; 
             novastatus->boolean = 1; 
         }
-        baseRec(0,contaRecords((*dbf)));
+        baseRec(1, contaRecords((*dbf)));
     }
 }
 
@@ -1051,8 +1068,8 @@ void gotodado(DBF **dbf,Status **atual,char reg[]){
             campo = campo->prox;
         }
     }
-    baseRec(recordAtual((*dbf)->status,status),contaRecords(*dbf));
 
+    baseRec(recordAtual((*dbf)->status,status), contaRecords(*dbf));
 }
 
 //12
@@ -1101,6 +1118,50 @@ void display(DBF *dbf, Status *pos, Fila *F){
     
 }
 
+//13
+void edit(DBF **dbf, Status **atual) {
+    Campo *campo = NULL;
+    Dados *dado = NULL;
+    int y = 8;
+    char linha[100];
+
+    if (*dbf != NULL) {
+        campo = (*dbf)->campos;
+
+        if (campo != NULL) {
+
+            //Printa os Campos que existem no arq
+            exibeTitulosCampos(campo);
+            while (campo != NULL) {
+                dado = campo->Patual;
+
+                sizeToSpace(20, y, campo->Width);
+                textcolor(BLACK); textbackground(LIGHTGRAY);
+                insere(campo, &dado, 20, y);
+                fflush(stdin);
+
+                campo = campo->prox;
+                y++;
+            }
+
+        }
+    }
+}
+
+void exibeTitulosCampos(Campo *campo) {
+    int y = 8;
+
+    while(campo->prox != NULL){
+        gotoxy(7, y);
+        printf("%s:\n",campo->FieldName);
+        campo = campo->prox;
+        y++;
+    }
+
+    gotoxy(7, y);
+    printf("%s:\n", campo->FieldName);
+}
+
 //14
 void deleteUni(DBF **dbf, Status **status){
     Campo *campos = NULL;
@@ -1114,7 +1175,7 @@ void deleteUni(DBF **dbf, Status **status){
         if(auxSt != NULL && auxSt->boolean){
 
             auxSt->boolean = 0;
-            baseRec(0,contaRecords(*dbf));
+            baseRec(1, contaRecords(*dbf));
             // Status atual recebe a cabeça da lista de status
             auxSt = (*dbf)->status;
         }
@@ -1142,7 +1203,7 @@ void deleteAll(DBF **dbf, Status **status){
             }
             auxSt = auxSt->prox;
         }
-        baseRec(0,contaRecords(*dbf));
+        baseRec(1, contaRecords(*dbf));
 
         // Status atual recebe a cabeça da lista de status
         (*status) = (*dbf)->status;
