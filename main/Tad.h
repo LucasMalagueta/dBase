@@ -1283,6 +1283,12 @@ void modifyStrucutre(DBF **dbf) {
     Campo *campo = NULL, *exibir;
     char op;
     int x = 7, y = 10, count = 1;
+    char data[11], hr[9];
+
+    time_t t = time(NULL);
+    struct tm *tm_info = localtime(&t);
+    strftime(data, 11, "%d/%m/%Y", tm_info);
+    strftime(hr, 11, "%H:%M:%S", tm_info);
 
     if (*dbf != NULL) {
         campo = (*dbf)->campos;
@@ -1352,6 +1358,10 @@ void modifyStrucutre(DBF **dbf) {
             }
             textcolor(LIGHTGRAY); textbackground(BLACK);
         }
+        //Atualiza o last update do Arq ref.
+        strcpy((*dbf)->Hora,hr);
+        strcpy((*dbf)->Data,data);
+
     }
 }
 
