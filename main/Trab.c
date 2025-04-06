@@ -224,7 +224,8 @@ int main() {
 
             case 17:
                 //Foi digitado o comando "SORT"
-                
+                extrairParametro(comando, arg);
+                sort(&aberto, arg);
             break;
             
             default:

@@ -984,8 +984,8 @@ void locate(DBF **dbf, char *Nomecampo, char *Nomedado, Fila *F) {
                                 case 'N':
                                     //Converter valor respeitando Dec e casting
                                     sprintf(linha, "%*f", campo->Dec, dado->tipo.valorN);
-                                    val = (float) atoi(linha);
-                                    if (val - (float) atoi(Nomedado) == 0) {
+                                    val = (float) atof(linha);
+                                    if (val - (float) atof(Nomedado) == 0) {
                                         flag = 0;
                                     }
                                 break;
@@ -1450,6 +1450,96 @@ void alteraCampo(Campo **campo, int x, int y) {
             gotoxy(x + 31, y);
             printf("0");
             (*campo)->Dec = 0;
+        }
+    }
+}
+
+//20
+void sort(DBF *dbf, char *campoAlvo) {
+    Campo *campo = NULL, *campo2 = NULL;
+    Dados *dado = NULL, *dado2 = NULL;
+    int pos = 0;
+
+    if (dbf != NULL) {
+        campo = dbf->campos;
+        if(campo != NULL) {
+            while (campo != NULL && !compare(campoAlvo, campo->FieldName)) {
+                campo = campo->prox;
+            }
+
+            if (compare(campoAlvo, campo->FieldName)) {
+                dado = campo->Pdados;
+                if (dado != NULL) {
+                    while (dado != NULL) {
+                        sortDados(dbf, dado, campo, pos);
+                        
+                        dado = dado->prox;
+                        pos++;
+                    }
+                }
+            }
+        }
+    }
+}
+
+void sortDados(DBF *dbf, Dados *dado, Campo *campo, int pos) {
+    Dados *auxDado = dado;
+    int i = pos, troca;
+    float val, menor;
+    char floatchar[10];
+
+    switch (campo->Type) {
+        case 'N':
+            sprintf(floatchar, "%*f", campo->Dec, auxDado->tipo.valorN);
+            val = (float) atof(floatchar);
+            menor = val;
+            while(auxDado != NULL) {
+                sprintf(floatchar, "%*f", campo->Dec, auxDado->tipo.valorN);
+                val = (float) atof(floatchar);
+
+                if (menor < val) {
+                    menor = val;
+                    troca = i;
+                }
+
+                auxDado = auxDado->prox;
+                i++;
+            }
+            
+            trocaDados(dbf, pos, troca);
+        break;
+    }
+}
+
+void trocaDados(DBF *dbf, int pos1, int pos2) {
+    Campo *campo;
+    Dados *dado, *dado1, *dado2;
+    
+    if (dbf != NULL) {
+        campo = dbf->campos;
+        if(campo != NULL) {
+            while (campo != NULL) {
+                dado = campo->Pdados;
+
+                system("pause");
+                if (dado != NULL) {
+                    print2(5, 8, "");
+                    printf("%d %d", pos1, pos2); system("pause");
+                    for (int i = pos1; i < pos1 - 1; i--) {
+                        dado = dado->prox;
+                    } 
+                    dado1 = dado;
+                    for (int i = pos2; i < pos2 - 1; i--) {
+                        dado = dado->prox;
+                    } 
+                    dado2 = dado;
+                    
+                    dado1->prox = dado2->prox;
+                    dado2->prox = dado1->prox;
+                }
+                
+                campo = campo->prox;
+            }
         }
     }
 }
