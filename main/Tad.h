@@ -125,7 +125,9 @@ void exibelinhacampo2(int x, int y, int count, Campo *campo);
 void alteraCampo(Campo **campo, int x, int y);
 
 //SORT
-
+void sort(DBF **dbf, char *campoAlvo);
+void sortDados(DBF **dbf, Dados *dado, Campo *campo, int pos);
+void trocaDados(DBF **dbf, int pos1, int pos2);
 
 //Demais funções
 DBF* buscaDBF(char str[], DBF *dbf);
@@ -1465,13 +1467,13 @@ void alteraCampo(Campo **campo, int x, int y) {
 }
 
 //20
-void sort(DBF *dbf, char *campoAlvo) {
+void sort(DBF **dbf, char *campoAlvo) {
     Campo *campo = NULL, *campo2 = NULL;
     Dados *dado = NULL, *dado2 = NULL;
     int pos = 0;
 
-    if (dbf != NULL) {
-        campo = dbf->campos;
+    if (*dbf != NULL) {
+        campo = (*dbf)->campos;
         if(campo != NULL) {
             while (campo != NULL && !compare(campoAlvo, campo->FieldName)) {
                 campo = campo->prox;
@@ -1492,60 +1494,147 @@ void sort(DBF *dbf, char *campoAlvo) {
     }
 }
 
-void sortDados(DBF *dbf, Dados *dado, Campo *campo, int pos) {
+void sortDados(DBF **dbf, Dados *dado, Campo *campo, int pos) {
     Dados *auxDado = dado;
-    int i = pos, troca;
-    float val, menor;
-    char floatchar[10];
+    int i = pos, troca = 0;
+    float val, menorF;
+    char floatchar[10], menorS[60], menorL;
 
     switch (campo->Type) {
         case 'N':
             sprintf(floatchar, "%*f", campo->Dec, auxDado->tipo.valorN);
             val = (float) atof(floatchar);
-            menor = val;
+            menorF = val;
             while(auxDado != NULL) {
                 sprintf(floatchar, "%*f", campo->Dec, auxDado->tipo.valorN);
                 val = (float) atof(floatchar);
 
-                if (menor < val) {
-                    menor = val;
+                if (val < menorF) {
+                    menorF = val;
                     troca = i;
                 }
 
                 auxDado = auxDado->prox;
                 i++;
             }
-            
-            trocaDados(dbf, pos, troca);
         break;
+
+        case 'L':
+            menorL = auxDado->tipo.valorL;
+            while(auxDado != NULL) {
+                if (auxDado->tipo.valorL < menorL) {
+                    menorL = auxDado->tipo.valorL;
+                    troca = i;
+                }
+
+                auxDado = auxDado->prox;
+                i++;
+            }
+        break;
+
+        case 'D':
+            strcpy(menorS, auxDado->tipo.valorD);
+
+            while(auxDado != NULL) {
+                if (stricmp(menorS, auxDado->tipo.valorD) > 0) {
+                    strcpy(menorS, auxDado->tipo.valorD);
+                    troca = i;
+                }
+
+                auxDado = auxDado->prox;
+                i++;
+            }
+        break;
+
+        case 'C':
+            strcpy(menorS, auxDado->tipo.valorC);
+            while(auxDado != NULL) {
+                if (stricmp(menorS, auxDado->tipo.valorC) > 0) {
+                    strcpy(menorS, auxDado->tipo.valorC);
+                    troca = i;
+                }
+
+                auxDado = auxDado->prox;
+                i++;
+            }
+        break;
+
+        case 'M':
+            strcpy(menorS, auxDado->tipo.valorM);
+
+            while(auxDado != NULL) {
+                if (stricmp(menorS, auxDado->tipo.valorM) > 0) {
+                    strcpy(menorS, auxDado->tipo.valorM);
+                    troca = i;
+                }
+
+                auxDado = auxDado->prox;
+                i++;
+            }
+        break;
+    }
+
+    if (troca > 0) {
+        trocaDados(dbf, pos, troca);
     }
 }
 
-void trocaDados(DBF *dbf, int pos1, int pos2) {
+void trocaDados(DBF **dbf, int pos1, int pos2) {
     Campo *campo;
     Dados *dado, *dado1, *dado2;
+    Tipo temp;
+    char charAux[60];
+    float floatAux;
     
     if (dbf != NULL) {
-        campo = dbf->campos;
+        campo = (*dbf)->campos;
         if(campo != NULL) {
             while (campo != NULL) {
                 dado = campo->Pdados;
 
-                system("pause");
                 if (dado != NULL) {
-                    print2(5, 8, "");
-                    printf("%d %d", pos1, pos2); system("pause");
-                    for (int i = pos1; i < pos1 - 1; i--) {
+                    // print2(5, 8, "");
+                    // printf("%d %d", pos1, pos2); system("pause");
+                    for (int i = 0; i < pos1; i++) {
                         dado = dado->prox;
                     } 
                     dado1 = dado;
-                    for (int i = pos2; i < pos2 - 1; i--) {
+                    for (int i = 0; i < pos2; i++) {
                         dado = dado->prox;
                     } 
                     dado2 = dado;
                     
-                    dado1->prox = dado2->prox;
-                    dado2->prox = dado1->prox;
+                    switch (campo->Type) {
+                        case 'N':
+                            temp.valorN = dado1->tipo.valorN;
+                            dado1->tipo.valorN = dado2->tipo.valorN;
+                            dado2->tipo.valorN = temp.valorN;
+                        break;
+            
+                        case 'L':
+                            temp.valorL = dado1->tipo.valorL;
+                            dado1->tipo.valorL = dado2->tipo.valorL;
+                            dado2->tipo.valorL = temp.valorL;
+                        break;
+                
+                        case 'D':
+                            strcpy(charAux, dado1->tipo.valorD);
+                            strcpy(dado1->tipo.valorD, dado2->tipo.valorD);
+                            strcpy(dado2->tipo.valorD, charAux);
+                        break;
+                
+                        case 'C':
+                            temp.valorC = dado1->tipo.valorC;
+                            dado1->tipo.valorC = dado2->tipo.valorC;
+                            dado2->tipo.valorC = temp.valorC;
+                        break;
+                
+                        case 'M':
+                            temp.valorM = dado1->tipo.valorM;
+                            dado1->tipo.valorM = dado2->tipo.valorM;
+                            dado2->tipo.valorM = temp.valorM;
+                        break;
+                    }
                 }
                 
                 campo = campo->prox;
