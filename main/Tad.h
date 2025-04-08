@@ -1468,8 +1468,8 @@ void alteraCampo(Campo **campo, int x, int y) {
 
 //20
 void sort(DBF **dbf, char *campoAlvo) {
-    Campo *campo = NULL, *campo2 = NULL;
-    Dados *dado = NULL, *dado2 = NULL;
+    Campo *campo = NULL;
+    Dados *dado = NULL;
     int pos = 0;
 
     if (*dbf != NULL) {
