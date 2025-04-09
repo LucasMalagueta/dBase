@@ -481,9 +481,9 @@ int contaRecords(DBF *dbf) {
         aux = dbf->status;
         while(aux != NULL) {
 
-            if(aux->boolean) {
-                i++;
-            }
+            //if(aux->boolean) {//FAZER SET DELETE AQUI!
+            i++;
+            //}
             aux = aux->prox;
         }
 
@@ -513,18 +513,18 @@ int recordAtual(Status *status, Status *pos){
     int i = 1;
     
     while (status != NULL) {
-        if(status->boolean){
-            if (status == pos){
-                return i;
-            }
-            // Só altera a pos se nao estiver excluido
-            i++;
+        //if(status->boolean){//FAZER O SET DELETE AQUI!
+        if (status == pos){
+            return i;
         }
+        // Só altera a pos se nao estiver excluido
+        i++;
+        //}
         // Avança na lista
         status = status->prox;
     }
 
-    return -1;
+    return 0;
 }
 
 //4
@@ -1256,6 +1256,7 @@ void reCallAll(DBF **dbf,  Fila *F){
             sprintf(linha, "no record recalled");
         }
     }
+    inserir(F, linha);
 }
 
 //18
@@ -1293,6 +1294,7 @@ void zap(DBF **dbf) {
             }
             (*dbf)->status = NULL;
         }
+        baseRec(0, contaRecords(*dbf));
     }
 }
 

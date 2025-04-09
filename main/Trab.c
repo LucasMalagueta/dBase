@@ -44,9 +44,9 @@ int main() {
         dica1(0, "");
         dica2(0, "Enter a dBASE III PLUS command");
         baseCmd("Command Line");
-        // if (existeDados(aberto)) {
-        //     baseRec(1, contaRecords(aberto));
-        // }
+        if (existeDados(aberto)) {
+             baseRec(1, contaRecords(aberto));
+        }
         lerComando(comando);
         strSplit(comando, cmd, ' ');
         // gotoxy(5, 8);
@@ -88,6 +88,7 @@ int main() {
                     clear(&F);
                     Create(&unid, &aberto, arg);
                     clear(&F);
+                    baseRec(recordAtual(aberto->status,&atual), contaRecords(aberto));
                 }
             break;
 
@@ -113,7 +114,7 @@ int main() {
                     USE(&aberto, buscaDBF(arg, aberto));
                     strSplit(arg, cmd, '.');
                     baseDBF(cmd);
-                    baseRec(1, contaRecords(aberto));
+                    baseRec(recordAtual(aberto->status,&atual), contaRecords(aberto));
                 }
 
             break;
@@ -203,6 +204,7 @@ int main() {
             break;
 
             case 13:
+                //Foi digitado o comando "RECALL"
                 extrairParametros(args, comando);
                 if(compare(args[1],"ALL")){
                     reCallAll(&aberto,&F);
@@ -211,7 +213,7 @@ int main() {
                    reCall(&atual,&F); 
                 }
                 baseRec(1, contaRecords(aberto));
-                clear(&F);
+                exibir(&F);
             break;
 
             case 15:
@@ -223,7 +225,6 @@ int main() {
             //Foi digitado comando que começa com "MODIFY"
             extrairParametro(comando, arg);
             if (compare(arg, "STRUCTURE")) {
-                clear(&F);
                 baseCmd("MODIFY STRUCTURE");
                 modifyStrucutre(&aberto);
                 clear(&F);
