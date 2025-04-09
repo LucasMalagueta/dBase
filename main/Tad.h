@@ -1064,24 +1064,20 @@ void gotodado(DBF **dbf,Status **atual,char reg[]){
             status = (*dbf)->status;
 
             //percorre a qntd de vezes que o usuario digitou no campo dados
-            for(i = atoi(reg); i - 1 > 0 && dado != NULL; i--){
-                if(status->boolean){
-                    dado = dado->prox;
-                    status = status->prox;
-                }
-                else
-                    i++;
+            for(i = atoi(reg); i > 1 && dado != NULL; i--){
+                dado = dado->prox;
+                status = status->prox;
                 
             }
             if(dado != NULL ){
                 campo->Patual = dado;
                 *atual = status;
+                baseRec(recordAtual((*dbf)->status,status), contaRecords(*dbf));
             }
             campo = campo->prox;
         }
     }
-
-    baseRec(recordAtual((*dbf)->status,status), contaRecords(*dbf));
+    
 }
 
 //12
@@ -1257,6 +1253,75 @@ void reCallAll(DBF **dbf,  Fila *F){
         }
     }
     inserir(F, linha);
+}
+
+//17
+void pack(DBF **dbf) {
+    Campo *campo, *auxCampo;
+    Dados *dado, *antDado;
+    Status *status, *antStatus;
+    char flag;
+    int cont = 0;
+
+    if ((*dbf) != NULL) {
+        campo = (*dbf)->campos;
+        status = (*dbf)->status;
+
+        //Exclui dados
+        if(campo != NULL) {
+
+            //Percorre a Lista de Status inteira desde o começo
+            while(status != NULL){
+
+                flag = 0;
+                //se for false, da free na caixa
+                if(!status->boolean){
+                    if(status->prox != NULL){
+                        antStatus = status->prox;
+                        free(status);
+                    }else{
+                        antStatus = NULL;
+                        free(status);
+                    }
+
+                    flag = 1;  
+                }
+
+                //status do dado referente é false
+                if(flag == 1){
+                    //auxCampo aponta para o primeiro campo do arq
+                    auxCampo = (*dbf)->campos;
+
+                    //anda por todos os campos
+                    while(auxCampo != NULL){
+                        //dado aponta para o primeiro dado do campo
+                        dado = auxCampo->Pdados;
+
+                        //percorre até o nivel que achou o status false
+                        for(int i = 0;cont > i ;i++){
+                            antDado = dado;
+                            dado = dado->prox;
+                        }
+                        //da Free no dado
+                        if(dado != NULL){
+                            antDado = dado->prox;
+                            freeDado(auxCampo,dado);
+                        }
+                        //passa para o proximo campo
+                        auxCampo = auxCampo->prox;
+                    }
+                    
+                }
+                //nivel do dado;
+                cont++;
+                antStatus = status;
+                status = status->prox;
+            }
+        }
+        
+        baseRec(0, contaRecords(*dbf));
+    }
+    system("pause");
 }
 
 //18

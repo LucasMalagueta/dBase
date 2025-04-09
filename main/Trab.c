@@ -44,9 +44,9 @@ int main() {
         dica1(0, "");
         dica2(0, "Enter a dBASE III PLUS command");
         baseCmd("Command Line");
-        if (existeDados(aberto)) {
-             baseRec(1, contaRecords(aberto));
-        }
+        // if (existeDados(aberto)) {
+        //      baseRec(0, contaRecords(aberto));
+        // }
         lerComando(comando);
         strSplit(comando, cmd, ' ');
         // gotoxy(5, 8);
@@ -88,7 +88,7 @@ int main() {
                     clear(&F);
                     Create(&unid, &aberto, arg);
                     clear(&F);
-                    baseRec(recordAtual(aberto->status,&atual), contaRecords(aberto));
+                    baseRec(recordAtual(aberto->status,atual), contaRecords(aberto));
                 }
             break;
 
@@ -114,7 +114,7 @@ int main() {
                     USE(&aberto, buscaDBF(arg, aberto));
                     strSplit(arg, cmd, '.');
                     baseDBF(cmd);
-                    baseRec(recordAtual(aberto->status,&atual), contaRecords(aberto));
+                    baseRec(recordAtual(aberto->status,atual), contaRecords(aberto));
                 }
 
             break;
@@ -214,6 +214,12 @@ int main() {
                 }
                 baseRec(1, contaRecords(aberto));
                 exibir(&F);
+            break;
+
+            case 14:
+                //Foi digitado o comando "PACK"
+                system("pause");
+                pack(&aberto);
             break;
 
             case 15:
