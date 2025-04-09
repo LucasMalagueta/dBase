@@ -1312,59 +1312,68 @@ int setDeleteOff() {
 }
 
 //17
-void pack(DBF **dbf) {
-    Campo *campo = (*dbf)->campos;
-    Status *status = (*dbf)->status;
-    Status *prevStatus = NULL;
-    int recordIndex = 0;
-
-    while (status != NULL) {
-        if (!status->boolean) {
-            //Remove dados de todos os campos no nível correspondente
-            Campo *auxCampo = (*dbf)->campos;
-            while (auxCampo != NULL) {
-                Dados *dado = auxCampo->Pdados;
-                Dados *prevDado = NULL;
-
-                for (int i = 0; i < recordIndex && dado != NULL; i++) {
-                    prevDado = dado;
-                    dado = dado->prox;
-                }
-
-                if (dado != NULL) {
-                    if (prevDado == NULL) {
-                        auxCampo->Pdados = dado->prox;
-                    } else {
-                        prevDado->prox = dado->prox;
+void pack(DBF **dbf, Status **atual) {
+    Campo *campo = NULL;
+    Status *status = NULL, *statusAnt = NULL, *aux = NULL;
+    Dados *dado = NULL, *dadoAnt = NULL;
+    int nivel = 0, flag;
+    
+    if ((*dbf) != NULL) {
+        //Altera para o primeiro para evitar erros
+        *atual = (*dbf)->status; //Nao vai ser utilizado na função
+        status = (*dbf)->status;
+        
+        while (status != NULL) {
+            flag = 0;
+            if (!status->boolean) {
+                //Remove dados de todos os campos no nível correspondente
+                campo = (*dbf)->campos;
+                campo->Patual = campo->Pdados; //Altera para o primeiro para evitar erros
+                
+                while (campo != NULL) {
+                    dado = campo->Pdados;
+                    dadoAnt = NULL;
+                    
+                    for (int i = 1; i < nivel && dado != NULL; i++) {
+                        dadoAnt = dado;
+                        dado = dado->prox;
                     }
-
-                    if (auxCampo->Patual == dado) {
-                        auxCampo->Patual = dado->prox;
+                    
+                    if (dado != NULL) {
+                        //Primeira caixa é nula
+                        if (dadoAnt == NULL) {
+                            campo->Pdados = dado->prox;
+                            campo->Patual = dado->prox;
+                        } else {
+                            dadoAnt->prox = dado->prox;
+                        }
+                        
+                        freeDado(campo, dado);
                     }
-
-                    freeDado(auxCampo,dado);
+                    
+                    campo = campo->prox;
                 }
-
-                auxCampo = auxCampo->prox;
+                
+                //Remove o status atual
+                aux = status;
+                if (statusAnt == NULL) {
+                    (*dbf)->status = status->prox;
+                    status = (*dbf)->status;
+                } else {
+                    statusAnt->prox = status->prox;
+                    status = statusAnt->prox;
+                }
+                
+                free(aux);
+                flag = 1;
             }
-
-            //Remove o status atual
-            Status *toRemove = status;
-            if (prevStatus == NULL) {
-                (*dbf)->status = status->prox;
-                status = (*dbf)->status;
-            } else {
-                prevStatus->prox = status->prox;
-                status = prevStatus->prox;
+            
+            if (!flag) {
+                statusAnt = status;
+                status = status->prox;
+                nivel++;
             }
-
-            free(toRemove);
-            continue; //não aumenta recordIndex neste caso
         }
-
-        prevStatus = status;
-        status = status->prox;
-        recordIndex++;
     }
 
     baseRec(0, contaRecords(*dbf));

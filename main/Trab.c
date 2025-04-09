@@ -226,8 +226,7 @@ int main() {
 
             case 14:
                 //Foi digitado o comando "PACK"
-                system("pause");
-                pack(&aberto);
+                pack(&aberto, &atual);
             break;
 
             case 15:
