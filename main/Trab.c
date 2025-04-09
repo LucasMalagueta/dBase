@@ -45,7 +45,7 @@ int main() {
         dica2(0, "Enter a dBASE III PLUS command");
         baseCmd("Command Line");
         if (existeDados(aberto)) {
-             baseRec(1, contaRecords(aberto));
+            baseRec(1, contaRecords(aberto));
         }
         lerComando(comando);
         strSplit(comando, cmd, ' ');
@@ -88,7 +88,7 @@ int main() {
                     clear(&F);
                     Create(&unid, &aberto, arg);
                     clear(&F);
-                    baseRec(recordAtual(aberto->status,&atual), contaRecords(aberto));
+                    baseRec(recordAtual(aberto->status, atual), contaRecords(aberto));
                 }
             break;
 
@@ -114,7 +114,7 @@ int main() {
                     USE(&aberto, buscaDBF(arg, aberto));
                     strSplit(arg, cmd, '.');
                     baseDBF(cmd);
-                    baseRec(recordAtual(aberto->status,&atual), contaRecords(aberto));
+                    baseRec(recordAtual(aberto->status, atual), contaRecords(aberto));
                 }
 
             break;
@@ -292,28 +292,11 @@ void strSplit(char str[], char str2[], char del) {
 void lerComando(char str[]) {
     char cmd[50], ch;
     int i;
-    Strdin *S;
-    inicializarSdin(&S);
 
     do {
         print2(5, 19, ". ");
-  
-        //Scannear string
-        do {
-            ch = leChar();
-            inserirSdin(&S, ch);
-            if (ch == 8) {
-                print2(wherex(), 19, " ");
-                gotoxy(wherex() - 1, 19);
-            }
-            if (wherex() < 8) {
-                print2(5, 19, ". ");
-            }
-        } while (tamanhoSdin(S) < 80 && ch != 13);
-        strcpy(str, converteStrdin(S));
-        reiniciarSdin(&S);
 
-        strSplit(str, cmd, ' ');
+        strSplit(gets(str), cmd, ' ');
 
         gotoxy(5, 19);
         //Linha de comando
