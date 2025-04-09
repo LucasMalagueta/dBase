@@ -1228,10 +1228,10 @@ void exibeTitulosCampos(Campo *campo) {
 
 //14
 void deleteUni(DBF **dbf, Status **status){
-    Campo *campos = (*dbf)->campos;
+    Campo *campos = NULL;
     if((*dbf) != NULL){
-
-        if(*status != NULL && (*status)->boolean){
+        campos = (*dbf)->campos;
+        if(*status != NULL){
 
             (*status)->boolean = 0;
             // baseRec(1, contaRecords(*dbf));
@@ -1384,11 +1384,11 @@ void pack(DBF **dbf) {
 
 //16
 char setDeleteOn() {
-    return '1';
+    return '0';
 }
 
 char setDeleteOff() {
-    return '0';
+    return '1';
 }
 
 //18
