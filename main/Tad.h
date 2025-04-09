@@ -131,7 +131,7 @@ void exibelinhacampo2(int x, int y, int count, Campo *campo);
 void alteraCampo(Campo **campo, int x, int y);
 
 //SORT
-void sort(DBF **dbf, char *campoAlvo);
+void sort(DBF **dbf, Status **atual, char *campoAlvo);
 void sortDados(DBF **dbf, Dados *dado, Campo *campo, int pos);
 void trocaDados(DBF **dbf, int pos1, int pos2);
 
@@ -829,8 +829,8 @@ void resolveMemo(DBF *dbf, Campo *campo, Fila *F, int i, char *linha, char setDe
     int sint, flag;
 
     campo = dbf->campos;
-    sprintf(linha, "%7c ", 200);
     while(campo != NULL) {
+        sprintf(linha, "%7c ", 200);
         dado = campo->Pdados;
         status = dbf->status;
 
@@ -875,6 +875,7 @@ void extraiMemo(Campo *campo, Dados *dado, char *linha, Fila *F) {
         case 'M':
             sprintf(linha, "%s%7s%-*s", linha, "MEMO - ", campo->Width, dado->tipo.valorM);
             inserir(F, linha);
+            sprintf(linha, " ");
         break;
     }
 }
@@ -1672,14 +1673,16 @@ void alteraCampo(Campo **campo, int x, int y) {
 }
 
 //20
-void sort(DBF **dbf, char *campoAlvo) {
+void sort(DBF **dbf, Status **atual, char *campoAlvo) {
     Campo *campo = NULL;
     Dados *dado = NULL;
     int pos = 0;
 
     if (*dbf != NULL) {
+        *atual = (*dbf)->status; //Nao vai ser utilizado na função
         campo = (*dbf)->campos;
         if(campo != NULL) {
+            campo->Patual = campo->Pdados; //Altera para o primeiro para evitar erros
             while (campo != NULL && !compare(campoAlvo, campo->FieldName)) {
                 campo = campo->prox;
             }
@@ -1804,7 +1807,7 @@ void trocaDados(DBF **dbf, int pos1, int pos2) {
                         dado = dado->prox;
                     } 
                     dado1 = dado;
-                    for (int i = 0; i < pos2; i++) {
+                    for (int i = pos1; i < pos2; i++) {
                         dado = dado->prox;
                     } 
                     dado2 = dado;

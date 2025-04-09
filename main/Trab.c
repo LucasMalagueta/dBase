@@ -1,3 +1,5 @@
+//MATEUS SILVA MACIEL
+//LUCAS ATAIDE MALAGUETA
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -249,7 +251,7 @@ int main() {
             case 17:
                 //Foi digitado o comando "SORT"
                 extrairParametro(comando, arg);
-                sort(&aberto, arg);
+                sort(&aberto, &atual, arg);
             break;
             
             default:
