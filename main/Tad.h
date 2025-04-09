@@ -81,7 +81,7 @@ char* returnCH(char ch);
 void list(DBF *dbf, Fila *F); 
 void listFor(DBF *dbf, char campoA[], char alvo[], Fila *F);
 char compare2(char str[], char str2[]);
-char comparaDados(Dados *dado, char tipo, char alvo[]);
+char comparaDados(Dados *dado, Campo *campo, char alvo[]);
 void extraiDado(Campo *campo, Dados *dado, char *linha);
 
 //APPEND
@@ -287,8 +287,7 @@ char leChar() {
         ch = getche();
         fflush(stdin);
     } while ((ch < 48 && ch > 57) || (ch < 65 && ch > 90) ||
-             (ch < 97 && ch > 122) || (ch > 13 && ch < 13) ||
-             (ch > 95 && ch < 95));
+             (ch < 97 && ch > 122) || (ch > 13 && ch < 13));
 
     return ch;
 }
@@ -314,19 +313,22 @@ Campo *cadastraCampo(DBF **dbf, int x, int y) {
     //Checar se o DBF existe
     if (*dbf != NULL) {
         novo = (Campo *)malloc(sizeof(Campo));
+        
+        //Scannear string
         gotoxy(x + 3, y);
-
-        // scanf("%s", novo->FieldName);
-        // fflush(stdin);
         do {
             ch = leChar();
             inserirSdin(&S, ch);
+            if (wherex() < x + 3) {
+                gotoxy(x + 3, y);
+            }
         } while (tamanhoSdin(S) < 10 && ch != 13);
         strcpy(novo->FieldName, converteStrdin(S));
         reiniciarSdin(&S);
 
-        gotoxy(x + 15, y);
+        //Scannear char
         do {
+            gotoxy(x + 15, y);
             tipo = toupper(getch());
         } while(verificach(tipo));
         novo->Type = tipo;
@@ -353,14 +355,17 @@ Campo *cadastraCampo(DBF **dbf, int x, int y) {
                     novo->Width = 10;
                 } 
                 else {
-                    // scanf("%d", &novo->Width);
                     do {
                         reiniciarSdin(&S);
                         print2(x + 26, y, "   ");
                         gotoxy(x + 26, y);
+                        //Scannear int
                         do {
                             ch = leNum();
                             inserirSdin(&S, ch);
+                            if (wherex() < x + 26) {
+                                gotoxy(x + 26, y);
+                            }
                         } while (tamanhoSdin(S) < 2 && ch != 13);
                     } while (atoi(converteStrdin(S)) > 50);
                     novo->Width = atoi(converteStrdin(S));
@@ -370,12 +375,12 @@ Campo *cadastraCampo(DBF **dbf, int x, int y) {
         }
         
         if (tipo == 'N') {
-            //scanf("%d", &novo->Dec);
             do {
                 reiniciarSdin(&S);
                 print2(x + 31, y, "   ");
-                gotoxy(x + 31, y);
+                //Scannear int
                 do {
+                    gotoxy(x + 31, y); 
                     ch = leNum();
                     inserirSdin(&S, ch);
                 } while (tamanhoSdin(S) < 1);
@@ -665,6 +670,9 @@ void insere(Campo* campo, Dados **nova, int x, int y) {
             do {
                 ch = leChar();
                 inserirSdin(&S, ch);
+                if (wherex() < x) {
+                    gotoxy(x, y);
+                }
             } while (tamanhoSdin(S) < campo->Width && ch != 13);
 
             (*nova)->tipo.valorN = (float)atof(converteStrdin(S));
@@ -678,6 +686,9 @@ void insere(Campo* campo, Dados **nova, int x, int y) {
                 textcolor(BLACK); textbackground(LIGHTGRAY);
                 ch = leChar();
                 inserirSdin(&S, ch);
+                if (wherex() < x) {
+                    gotoxy(x, y);
+                }
                 textcolor(LIGHTGRAY); textbackground(BLACK);
             } while (tamanhoSdin(S) < campo->Width && ch != 13);
 
@@ -690,6 +701,7 @@ void insere(Campo* campo, Dados **nova, int x, int y) {
             sizeToSpace(x, y, campo->Width);
             do {
                 textcolor(BLACK); textbackground(LIGHTGRAY);
+                gotoxy(x, y);
                 ch = toupper(getch());
                 fflush(stdin);
             } while(verificach(ch));
@@ -706,6 +718,9 @@ void insere(Campo* campo, Dados **nova, int x, int y) {
                 ch = leChar();
                 inserirSdin(&S, ch);
                 textcolor(LIGHTGRAY); textbackground(BLACK);
+                if (wherex() < x) {
+                    gotoxy(x, y);
+                }
             } while (tamanhoSdin(S) < campo->Width && ch != 13);
 
             (*nova)->tipo.valorC = (char *)malloc((tamanhoSdin(S) + 1) * sizeof(char));
@@ -721,6 +736,9 @@ void insere(Campo* campo, Dados **nova, int x, int y) {
                 ch = leChar();
                 inserirSdin(&S, ch);
                 textcolor(LIGHTGRAY); textbackground(BLACK);
+                if (wherex() < x) {
+                    gotoxy(x, y);
+                }
             } while (tamanhoSdin(S) < campo->Width && ch != 13);
 
             (*nova)->tipo.valorM = (char *)malloc((tamanhoSdin(S) + 1) * sizeof(char));
@@ -865,7 +883,7 @@ void listFor(DBF *dbf, char campoA[], char alvo[], Fila *F) {
 
                             //Checar o dado daquela linha da match
                             if (dado != NULL) {
-                                flag = comparaDados(dado, campo->Type, alvo);
+                                flag = comparaDados(dado, campo, alvo);
                             }
                         }
                     }
@@ -898,33 +916,61 @@ void listFor(DBF *dbf, char campoA[], char alvo[], Fila *F) {
     }
 }
 
-char comparaDados(Dados *dado, char tipo, char alvo[]) {
-    char flag = 0;
+char comparaDados(Dados *dado, Campo *campo, char alvo[]) {
+    char flag = 0, i = 0;
+    char str[50];
+    float val;
 
-    switch (tipo) {
+    switch (campo->Type) {
         case 'N':
             //Converter string alvo para num e comparar
-        break;
-
-        case 'C':
-            if (compare2(alvo, dado->tipo.valorC)) {
+            sprintf(str, "%*f", campo->Dec, dado->tipo.valorN);
+            val = (float) atof(str);
+            if (val == (float) atof(alvo)) {
                 flag = 1;
             }
         break;
-        
-        default:
-            break;
+
+        case 'L':
+            if (alvo[0] == dado->tipo.valorL) {
+                flag = 1;
+            }
+        break;
+
+        case 'D':
+            if (compare2(dado->tipo.valorD, alvo)) {
+                flag = 1;
+            }
+        break;
+
+        case 'C':
+            if (compare2(dado->tipo.valorC, alvo)) {
+                flag = 1;
+            }
+        break;
+
+        case 'M':
+            if (compare2(dado->tipo.valorM, alvo)) {
+                flag = 1;
+            }
+        break;
     }
 
     return flag;
 }
 
 char compare2(char str[], char str2[]) {
-    char flag = 1;
-    for(int i = 0; str[i] != '\0'; i++) {
-        if (str[i] != str2[i]) {
-            flag = 0;
+    //return strstr(str, str2) != NULL;
+    char flag = 0;
+    int i = 0;
+    while (str[i] != '\0' && flag == 0) {
+        flag = 1;
+        for (int j = i, k = 0; str2[k] != '\0'; j++, k++) {
+            if (str2[k] != str[j]) {
+                flag = 0;
+            }
         }
+        i++;
     }
     return flag;
 }
@@ -1157,6 +1203,8 @@ void edit(DBF **dbf, Status **atual) {
 
         }
     }
+
+    textcolor(LIGHTGRAY); textbackground(BLACK);
 }
 
 void exibeTitulosCampos(Campo *campo) {
@@ -1404,16 +1452,18 @@ void alteraCampo(Campo **campo, int x, int y) {
 
     if (*campo != NULL) {
         gotoxy(x + 3, y);
-
         do {
             ch = leChar();
             inserirSdin(&S, ch);
+            if (wherex() < x + 3) {
+                gotoxy(x + 3, y);
+            }
         } while (tamanhoSdin(S) < 10 && ch != 13);
         strcpy((*campo)->FieldName, converteStrdin(S));
         reiniciarSdin(&S);
 
-        gotoxy(x + 15, y);
         do {
+            gotoxy(x + 15, y);
             tipo = toupper(getch());
         } while(verificach(tipo));
         (*campo)->Type = tipo;
@@ -1447,6 +1497,9 @@ void alteraCampo(Campo **campo, int x, int y) {
                         do {
                             ch = leNum();
                             inserirSdin(&S, ch);
+                            if (wherex() < x + 26) {
+                                gotoxy(x + 26, y);
+                            }
                         } while (tamanhoSdin(S) < 2 && ch != 13);
                     } while (atoi(converteStrdin(S)) > 50);
                     (*campo)->Width = atoi(converteStrdin(S));
@@ -1456,12 +1509,11 @@ void alteraCampo(Campo **campo, int x, int y) {
         }
         
         if (tipo == 'N') {
-            //scanf("%d", &novo->Dec);
             do {
                 reiniciarSdin(&S);
                 print2(x + 31, y, "   ");
-                gotoxy(x + 31, y);
                 do {
+                    gotoxy(x + 31, y);
                     ch = leNum();
                     inserirSdin(&S, ch);
                 } while (tamanhoSdin(S) < 1);

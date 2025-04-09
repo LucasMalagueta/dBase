@@ -31,7 +31,7 @@ int main() {
     Unidade *unid = NULL;
     DBF *aberto = NULL;
     Status *atual = NULL;
-    char comando[50], cmd[15], arg[15], aspas[60];
+    char comando[80], cmd[15], arg[15], aspas[60];
     char args[4][15];
 
     Fila F; 
@@ -206,6 +206,11 @@ int main() {
                 //Foi digitado o comando "RECALL"
             break;
 
+            case 14:
+                //Foi digitado o comando "PACK"
+                //pack(&aberto);
+            break;
+
             case 15:
                 //Foi digitado o comando "ZAP"
                 zap(&aberto);
@@ -276,13 +281,30 @@ void strSplit(char str[], char str2[], char del) {
 }
 
 void lerComando(char str[]) {
-    char cmd[50];
+    char cmd[50], ch;
     int i;
+    Strdin *S;
+    inicializarSdin(&S);
 
     do {
         print2(5, 19, ". ");
+  
+        //Scannear string
+        do {
+            ch = leChar();
+            inserirSdin(&S, ch);
+            if (ch == 8) {
+                print2(wherex(), 19, " ");
+                gotoxy(wherex() - 1, 19);
+            }
+            if (wherex() < 8) {
+                print2(5, 19, ". ");
+            }
+        } while (tamanhoSdin(S) < 80 && ch != 13);
+        strcpy(str, converteStrdin(S));
+        reiniciarSdin(&S);
 
-        strSplit(gets(str), cmd, ' ');
+        strSplit(str, cmd, ' ');
 
         gotoxy(5, 19);
         //Linha de comando
