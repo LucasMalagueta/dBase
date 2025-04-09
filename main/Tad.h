@@ -109,7 +109,8 @@ void deleteUni(DBF **dbf, Status **status);
 void deleteAll(DBF **dbf, Status **status);
 
 //RECALL
-void reCall(Status **status);
+void reCall(Status **status, Fila *F);
+void reCallAll(DBF **dbf,  Fila *F);
 
 //SET DELETED
 
@@ -485,9 +486,9 @@ int contaRecords(DBF *dbf) {
         aux = dbf->status;
         while(aux != NULL) {
 
-            if(aux->boolean) {
-                i++;
-            }
+            //if(aux->boolean) {//FAZER SET DELETE AQUI!
+            i++;
+            //}
             aux = aux->prox;
         }
 
@@ -517,18 +518,18 @@ int recordAtual(Status *status, Status *pos){
     int i = 1;
     
     while (status != NULL) {
-        if(status->boolean){
-            if (status == pos){
-                return i;
-            }
-            // Só altera a pos se nao estiver excluido
-            i++;
+        //if(status->boolean){//FAZER O SET DELETE AQUI!
+        if (status == pos){
+            return i;
         }
+        // Só altera a pos se nao estiver excluido
+        i++;
+        //}
         // Avança na lista
         status = status->prox;
     }
 
-    return -1;
+    return 0;
 }
 
 //4
@@ -1223,26 +1224,21 @@ void exibeTitulosCampos(Campo *campo) {
 
 //14
 void deleteUni(DBF **dbf, Status **status){
-    Campo *campos = NULL;
-    Status *auxSt = NULL;
-
+    Campo *campos = (*dbf)->campos;
     if((*dbf) != NULL){
 
-        campos = (*dbf)->campos;
-        auxSt = (*dbf)->status;
+        if(*status != NULL && (*status)->boolean){
 
-        if(auxSt != NULL && auxSt->boolean){
-
-            auxSt->boolean = 0;
-            baseRec(1, contaRecords(*dbf));
+            (*status)->boolean = 0;
+            // baseRec(1, contaRecords(*dbf));
             // Status atual recebe a cabeça da lista de status
-            auxSt = (*dbf)->status;
+            // (*status) = (*dbf)->status;
         }
         // Patual de todos os campos recebe a cabeça da lista de dados
-        while(campos != NULL){
-            campos->Patual = campos->Pdados;
-            campos = campos->prox;
-        }
+        // while(campos != NULL){
+        //     campos->Patual = campos->Pdados;
+        //     campos = campos->prox;
+        // }
     }
 }
 
@@ -1262,25 +1258,53 @@ void deleteAll(DBF **dbf, Status **status){
             }
             auxSt = auxSt->prox;
         }
-        baseRec(1, contaRecords(*dbf));
+        // baseRec(1, contaRecords(*dbf));
 
         // Status atual recebe a cabeça da lista de status
-        (*status) = (*dbf)->status;
+        // (*status) = (*dbf)->status;
 
         // Patual de todos os campos recebe a cabeça da lista de dados
-        while(campos != NULL){
-            campos->Patual = campos->Pdados;
-            campos = campos->prox;
-        }
+        // while(campos != NULL){
+        //     campos->Patual = campos->Pdados;
+        //     campos = campos->prox;
+        // }
     }
 }
 
 //15
-void reCall(Status **status){
+void reCall(Status **status, Fila *F){
+    char linha[100];
 
     if(*status != NULL && !(*status)->boolean){
         (*status)->boolean = 1;
+        sprintf(linha, "1 record recalled");
+    }else{
+        sprintf(linha, "no record recalled");
     }
+    inserir(F, linha);
+}
+void reCallAll(DBF **dbf,  Fila *F){
+    char linha[100];
+    Status *status = (*dbf)->status;
+    char flag = 0;
+
+    if(*dbf != NULL){
+        while(status != NULL){
+            if(!status->boolean){
+                status->boolean = 1;
+                flag = 1;
+            }
+            status = status->prox;
+        }
+        
+        if(flag){
+            sprintf(linha, "all record recalled");
+        }
+        else{
+            sprintf(linha, "no record recalled");
+        }
+    }
+    inserir(F, linha);
 }
 
 //18
@@ -1318,6 +1342,7 @@ void zap(DBF **dbf) {
             }
             (*dbf)->status = NULL;
         }
+        baseRec(0, contaRecords(*dbf));
     }
 }
 
