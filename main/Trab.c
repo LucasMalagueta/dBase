@@ -33,7 +33,7 @@ int main() {
     Status *atual = NULL;
     char comando[80], cmd[15], arg[15], aspas[60];
     char args[4][15];
-    char setDelete = 0;
+    int setDelete = 0;
 
     Fila F; 
     inicializar(&F);
@@ -77,12 +77,14 @@ int main() {
                             baseRec(0, 0);
                         }
                     }
-                }
-                if (compare(args[1], "DELETE") && compare(args[2], "OFF")) {
-                    setDelete = setDeleteOff();
-                }
-                if (compare(args[1], "DELETE") && compare(args[2], "ON")) {
-                    setDelete = setDeleteOn();;
+                } else {
+                    if (compare(args[1], "DELETE") && compare(args[2], "OFF")) {
+                        setDelete = setDeleteOff();
+                    } else {
+                        if (compare(args[1], "DELETE") && compare(args[2], "ON")) {
+                            setDelete = setDeleteOn();
+                        }
+                    }         
                 }
             break;
 
@@ -202,11 +204,11 @@ int main() {
             case 12:
                 //Foi digitado o comando "DELETE"
                 extrairParametros(args, comando);
-                if(compare(args[1],"ALL")){
-                    deleteAll(&aberto,&atual);
-
-                }else
-                    deleteUni(&aberto,&atual);
+                if(compare(args[1], "ALL")) {
+                    deleteAll(&aberto, &atual);
+                } else {
+                    deleteUni(&aberto, &atual);
+                }
             break;
 
             case 13:

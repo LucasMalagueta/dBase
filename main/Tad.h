@@ -113,8 +113,8 @@ void reCall(Status **status, Fila *F);
 void reCallAll(DBF **dbf,  Fila *F);
 
 //SET DELETED
-char setDeleteOn();
-char setDeleteOff();
+int setDeleteOn();
+int setDeleteOff();
 
 //PACK
 
@@ -757,7 +757,7 @@ void list(DBF *dbf, Fila *F, char setDelete) {
     Dados *dado = NULL, *nivelDado = NULL;
     Status *status = NULL;
     char linha[100], ch;
-    int i, size, flag, rec = 1;
+    int i, size, flag, rec = 1, sint;
 
     if (dbf != NULL) {
         campo = dbf->campos;
@@ -789,13 +789,14 @@ void list(DBF *dbf, Fila *F, char setDelete) {
                         dado = campo->Pdados;
                         status = dbf->status;
 
-                        for(int x = i; x > 1; x--) {
+                        for(int x = i; x > 1 && dado != NULL && status != NULL; x--) {
                             dado = dado->prox;
                             status = status->prox;
                         }
     
                         if (dado != NULL) {
-                            if (status->boolean || setDelete) {
+                            sint = (status->boolean) ? 1 : 0;
+                            if (sint || setDelete) {
                                 extraiDado(campo, dado, linha);
                                 flag = 1;
                             }
@@ -844,7 +845,7 @@ void listFor(DBF *dbf, char campoA[], char alvo[], Fila *F, char setDelete) {
     Dados *dado = NULL, *nivelDado = NULL;
     Status *status = NULL;
     char linha[100], ch, flag;
-    int i, size;
+    int i, size, sint;
 
     if (dbf != NULL) {
         campo = dbf->campos;
@@ -889,7 +890,8 @@ void listFor(DBF *dbf, char campoA[], char alvo[], Fila *F, char setDelete) {
 
                             //Checar o dado daquela linha da match
                             if (dado != NULL) {
-                                if (status->boolean || setDelete) { 
+                                sint = (status->boolean) ? 1 : 0;
+                                if (sint || setDelete) { 
                                     flag = comparaDados(dado, campo, alvo);
                                 }
                             }
@@ -1098,44 +1100,42 @@ void locate(DBF **dbf, char *Nomecampo, char *Nomedado, Fila *F) {
 }
 
 //11
-void gotodado(DBF **dbf,Status **atual,char reg[]){
-
+void gotodado(DBF **dbf, Status **atual, char reg[]) {
     Campo *campo = NULL;
     Dados *dado = NULL;
     Status *status = NULL;
     int i;
 
     //verifica se existe campo no .dbf
-    if((*dbf) != NULL){
-
+    if((*dbf) != NULL) {
         campo = (*dbf)->campos;
         status = (*dbf)->status;
         //verifica se o campo é NULL e percorre todos
-        while(campo != NULL && status != NULL){
-
+        while(campo != NULL && status != NULL) {
             dado = campo->Pdados;
             status = (*dbf)->status;
 
             //percorre a qntd de vezes que o usuario digitou no campo dados
-            for(i = atoi(reg); i > 1 && dado != NULL; i--){
+            for(i = atoi(reg); i > 1 && dado != NULL; i--) {
                 dado = dado->prox;
                 status = status->prox;
-                
             }
-            if(dado != NULL ){
+
+            //Atualiza o registro
+            if(dado != NULL ) {
                 campo->Patual = dado;
                 *atual = status;
                 baseRec(recordAtual((*dbf)->status,status), contaRecords(*dbf));
             }
+
             campo = campo->prox;
         }
     }
-    
 }
 
 //12
 void display(DBF *dbf, Status *pos, Fila *F, char setDelete) {
-    int i, size;
+    int i, size, sint;
     Campo *campo = NULL;
     Dados *nivelDado = NULL;
     char linha[100];
@@ -1159,7 +1159,8 @@ void display(DBF *dbf, Status *pos, Fila *F, char setDelete) {
                 inserir(F, linha);
 
                 campo = dbf->campos;
-                if (pos->boolean || setDelete) {
+                sint = (pos->boolean) ? 1 : 0;
+                if (sint || setDelete) {
                     i = recordAtual(dbf->status, pos);
                     sprintf(linha, "%7d", i);
                     
@@ -1227,23 +1228,10 @@ void exibeTitulosCampos(Campo *campo) {
 }
 
 //14
-void deleteUni(DBF **dbf, Status **status){
-    Campo *campos = NULL;
-    if((*dbf) != NULL){
-        campos = (*dbf)->campos;
-        if(*status != NULL){
-
-            (*status)->boolean = 0;
-            // baseRec(1, contaRecords(*dbf));
-            // Status atual recebe a cabeça da lista de status
-            // (*status) = (*dbf)->status;
-        }
-        // Patual de todos os campos recebe a cabeça da lista de dados
-        // while(campos != NULL){
-        //     campos->Patual = campos->Pdados;
-        //     campos = campos->prox;
-        // }
-    }
+void deleteUni(DBF **dbf, Status **status) {
+    if(*status != NULL) {
+        (*status)->boolean = 0;
+    } 
 }
 
 void deleteAll(DBF **dbf, Status **status){
@@ -1383,12 +1371,12 @@ void pack(DBF **dbf) {
 
 
 //16
-char setDeleteOn() {
-    return '0';
+int setDeleteOn() {
+    return 0;
 }
 
-char setDeleteOff() {
-    return '1';
+int setDeleteOff() {
+    return 1;
 }
 
 //18
