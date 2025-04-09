@@ -7,6 +7,7 @@ typedef struct strdin Strdin;
 
 void inicializarSdin(Strdin **ptr);
 void inserirSdin(Strdin **str, char info);
+void removerSdin(Strdin **str);
 void reiniciarSdin(Strdin **ptr);
 void exibirSdin(Strdin *str);
 int tamanhoSdin(Strdin *ptr);
@@ -19,20 +20,24 @@ void inicializarSdin(Strdin **ptr) {
 }
 
 void inserirSdin(Strdin **str, char info) {
-    Strdin *aux, *atual;
-    aux = (Strdin *)malloc(sizeof(Strdin));
-    aux->letra = info;
-    aux->prox = NULL;
-
-    if (*str == NULL) {
-        *str = aux;
+    if (info == 8) { //Inseriu um backspace
+        removerSdin(str);
     } else {
-        atual = *str;
-        while(atual->prox != NULL) {
-            atual = atual->prox;
-        }
+        Strdin *aux, *atual;
+        aux = (Strdin *)malloc(sizeof(Strdin));
+        aux->letra = info;
+        aux->prox = NULL;
 
-        atual->prox = aux;
+        if (*str == NULL) {
+            *str = aux;
+        } else {
+            atual = *str;
+            while(atual->prox != NULL) {
+                atual = atual->prox;
+            }
+
+            atual->prox = aux;
+        }
     }
 }
 
@@ -105,6 +110,27 @@ void concatSdin(Strdin **str1, Strdin **str2, Strdin **str3) {
         }
     
         aux->prox = *str2;
+    }
+}
+
+void removerSdin(Strdin **str) {
+    Strdin *atual = *str;
+    Strdin *anterior = NULL;
+
+    if (*str != NULL) {
+        if (atual->prox == NULL) {
+            free(atual);
+            *str = NULL;
+        } else {
+            while (atual->prox != NULL) {
+                anterior = atual;
+                atual = atual->prox;
+            }
+
+            free(atual);
+            anterior->prox = NULL;
+        }
+
     }
 }
 

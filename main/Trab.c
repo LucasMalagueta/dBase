@@ -31,8 +31,9 @@ int main() {
     Unidade *unid = NULL;
     DBF *aberto = NULL;
     Status *atual = NULL;
-    char comando[50], cmd[15], arg[15], aspas[60];
+    char comando[80], cmd[15], arg[15], aspas[60];
     char args[4][15];
+    char setDelete = 0;
 
     Fila F; 
     inicializar(&F);
@@ -77,6 +78,12 @@ int main() {
                         }
                     }
                 }
+                if (compare(args[1], "DELETE") && compare(args[2], "OFF")) {
+                    setDelete = setDeleteOff();
+                }
+                if (compare(args[1], "DELETE") && compare(args[2], "ON")) {
+                    setDelete = setDeleteOn();;
+                }
             break;
 
             case 1:
@@ -88,7 +95,7 @@ int main() {
                     clear(&F);
                     Create(&unid, &aberto, arg);
                     clear(&F);
-                    baseRec(recordAtual(aberto->status,atual), contaRecords(aberto));
+                    baseRec(recordAtual(aberto->status,atual),contaRecords(aberto));
                 }
             break;
 
@@ -122,7 +129,7 @@ int main() {
             case 5:
                 //Foi digitado comando que começa com "LIST"
                 if (compare(comando, "LIST")) {
-                    list(aberto, &F);
+                    list(aberto, &F, setDelete);
                     exibir(&F);
                 }
                 //Comando tem paramestros alem de LIST
@@ -139,7 +146,7 @@ int main() {
                         if (compare(args[1], "FOR")) {
                             extrairParametros(args, comando);
                             extraiAspas(comando, arg);
-                            listFor(aberto, args[2], arg, &F);
+                            listFor(aberto, args[2], arg, &F, setDelete);
                             exibir(&F);
                         }
                     }
@@ -161,8 +168,7 @@ int main() {
             case 8:
                 extrairParametros(args, comando);
                 //"LOCATE FOR..."
-                //LOCATE FOR MEMO ACIMA DE 35 CARACTERES NAO FUNCIONA, 
-                // RESOLVER DEPOIS
+                //LOCATE FOR MEMO ACIMA DE 35 CARACTERES NAO FUNCIONA
                 //aZqWeRtYuIoPlKjHgFdScVbNmXxCcVvBbN
                 //aZqWeRtYuIoPlKjHgFdScVbNmXxCcVvBbNnMmLlKkJjHhGgFf
                 if (compare(args[1], "FOR")) {
@@ -181,7 +187,7 @@ int main() {
 
             case 10:
                 //Foi digitado o comando "DISPLAY"
-                display(aberto, atual, &F);
+                display(aberto, atual, &F, setDelete);
                 exibir(&F);
             break;
 
@@ -291,7 +297,7 @@ void strSplit(char str[], char str2[], char del) {
 }
 
 void lerComando(char str[]) {
-    char cmd[50];
+    char cmd[50], ch;
     int i;
 
     do {
