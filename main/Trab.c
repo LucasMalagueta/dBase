@@ -33,6 +33,7 @@ int main() {
     Status *atual = NULL;
     char comando[80], cmd[15], arg[15], aspas[60];
     char args[4][15];
+    char setDelete = 0;
 
     Fila F; 
     inicializar(&F);
@@ -76,6 +77,12 @@ int main() {
                             baseRec(0, 0);
                         }
                     }
+                }
+                if (compare(args[1], "DELETE") && compare(args[2], "OFF")) {
+                    setDelete = setDeleteOff();
+                }
+                if (compare(args[1], "DELETE") && compare(args[2], "ON")) {
+                    setDelete = setDeleteOn();;
                 }
             break;
 
@@ -122,7 +129,7 @@ int main() {
             case 5:
                 //Foi digitado comando que começa com "LIST"
                 if (compare(comando, "LIST")) {
-                    list(aberto, &F);
+                    list(aberto, &F, setDelete);
                     exibir(&F);
                 }
                 //Comando tem paramestros alem de LIST
@@ -139,7 +146,7 @@ int main() {
                         if (compare(args[1], "FOR")) {
                             extrairParametros(args, comando);
                             extraiAspas(comando, arg);
-                            listFor(aberto, args[2], arg, &F);
+                            listFor(aberto, args[2], arg, &F, setDelete);
                             exibir(&F);
                         }
                     }
@@ -161,8 +168,7 @@ int main() {
             case 8:
                 extrairParametros(args, comando);
                 //"LOCATE FOR..."
-                //LOCATE FOR MEMO ACIMA DE 35 CARACTERES NAO FUNCIONA, 
-                // RESOLVER DEPOIS
+                //LOCATE FOR MEMO ACIMA DE 35 CARACTERES NAO FUNCIONA
                 //aZqWeRtYuIoPlKjHgFdScVbNmXxCcVvBbN
                 //aZqWeRtYuIoPlKjHgFdScVbNmXxCcVvBbNnMmLlKkJjHhGgFf
                 if (compare(args[1], "FOR")) {
@@ -181,7 +187,7 @@ int main() {
 
             case 10:
                 //Foi digitado o comando "DISPLAY"
-                display(aberto, atual, &F);
+                display(aberto, atual, &F, setDelete);
                 exibir(&F);
             break;
 

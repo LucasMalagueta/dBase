@@ -78,8 +78,8 @@ void ListStructure(Unidade *unid, DBF *dbf, Fila *F);
 char* returnCH(char ch);
 
 //LIST
-void list(DBF *dbf, Fila *F); 
-void listFor(DBF *dbf, char campoA[], char alvo[], Fila *F);
+void list(DBF *dbf, Fila *F, char setDelete);
+void listFor(DBF *dbf, char campoA[], char alvo[], Fila *F, char setDelete);
 char compare2(char str[], char str2[]);
 char comparaDados(Dados *dado, Campo *campo, char alvo[]);
 void extraiDado(Campo *campo, Dados *dado, char *linha);
@@ -98,7 +98,7 @@ void locate(DBF **dbf, char *Nomecampo, char *Nomedado, Fila *F);
 void gotodado(DBF **dbf,Status **atual,char reg[]);
 
 //DISPLAY
-void display(DBF *dbf, Status *pos, Fila *F);
+void display(DBF *dbf, Status *pos, Fila *F, char setDelete);
 
 //EDIT
 void edit(DBF **dbf, Status **atual);
@@ -113,6 +113,8 @@ void reCall(Status **status, Fila *F);
 void reCallAll(DBF **dbf,  Fila *F);
 
 //SET DELETED
+char setDeleteOn();
+char setDeleteOff();
 
 //PACK
 
@@ -750,7 +752,7 @@ void insere(Campo* campo, Dados **nova, int x, int y) {
 }
 
 //8
-void list(DBF *dbf, Fila *F) {
+void list(DBF *dbf, Fila *F, char setDelete) {
     Campo *campo = NULL;
     Dados *dado = NULL, *nivelDado = NULL;
     Status *status = NULL;
@@ -793,7 +795,7 @@ void list(DBF *dbf, Fila *F) {
                         }
     
                         if (dado != NULL) {
-                            if (status->boolean) {
+                            if (status->boolean || setDelete) {
                                 extraiDado(campo, dado, linha);
                                 flag = 1;
                             }
@@ -837,9 +839,10 @@ void extraiDado(Campo *campo, Dados *dado, char *linha) {
     }
 }
 
-void listFor(DBF *dbf, char campoA[], char alvo[], Fila *F) {
+void listFor(DBF *dbf, char campoA[], char alvo[], Fila *F, char setDelete) {
     Campo *campo = NULL;
     Dados *dado = NULL, *nivelDado = NULL;
+    Status *status = NULL;
     char linha[100], ch, flag;
     int i, size;
 
@@ -877,14 +880,18 @@ void listFor(DBF *dbf, char campoA[], char alvo[], Fila *F) {
 
                         if (campo != NULL) {
                             dado = campo->Pdados;
+                            status = dbf->status;
                             //Ir até o nivel correto
                             for(int x = i; x > 1; x--) {
                                 dado = dado->prox;
+                                status = status->prox;
                             }
 
                             //Checar o dado daquela linha da match
                             if (dado != NULL) {
-                                flag = comparaDados(dado, campo, alvo);
+                                if (status->boolean || setDelete) { 
+                                    flag = comparaDados(dado, campo, alvo);
+                                }
                             }
                         }
                     }
@@ -1131,7 +1138,7 @@ void gotodado(DBF **dbf,Status **atual,char reg[]){
 }
 
 //12
-void display(DBF *dbf, Status *pos, Fila *F){
+void display(DBF *dbf, Status *pos, Fila *F, char setDelete) {
     int i, size;
     Campo *campo = NULL;
     Dados *nivelDado = NULL;
@@ -1154,22 +1161,23 @@ void display(DBF *dbf, Status *pos, Fila *F){
                     campo = campo->prox;
                 }
                 inserir(F, linha);
-                
-                campo = dbf->campos;
-                i = recordAtual(dbf->status, pos);
-                sprintf(linha, "%7d", i);
-                
-                while(campo != NULL && pos != NULL) {
-                    nivelDado = campo->Patual;
 
-                    if (nivelDado != NULL && pos->boolean) {
-                        extraiDado(campo, nivelDado, linha);
+                campo = dbf->campos;
+                if (pos->boolean || setDelete) {
+                    i = recordAtual(dbf->status, pos);
+                    sprintf(linha, "%7d", i);
+                    
+                    while(campo != NULL && pos != NULL) {
+                        nivelDado = campo->Patual;
+
+                        if (nivelDado != NULL && pos->boolean) {
+                            extraiDado(campo, nivelDado, linha);
+                        }
+                        
+                        campo = campo->prox;
                     }
-                    
-                    campo = campo->prox;
-                    
+                    inserir(F, linha);
                 }
-                inserir(F, linha);
             }
         }
     }
@@ -1283,6 +1291,7 @@ void reCall(Status **status, Fila *F){
     }
     inserir(F, linha);
 }
+
 void reCallAll(DBF **dbf,  Fila *F){
     char linha[100];
     Status *status = (*dbf)->status;
@@ -1305,6 +1314,15 @@ void reCallAll(DBF **dbf,  Fila *F){
         }
     }
     inserir(F, linha);
+}
+
+//16
+char setDeleteOn() {
+    return '1';
+}
+
+char setDeleteOff() {
+    return '0';
 }
 
 //18
