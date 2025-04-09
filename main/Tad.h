@@ -734,8 +734,9 @@ void insere(Campo* campo, Dados **nova, int x, int y) {
 void list(DBF *dbf, Fila *F) {
     Campo *campo = NULL;
     Dados *dado = NULL, *nivelDado = NULL;
+    Status *status = NULL;
     char linha[100], ch;
-    int i, size;
+    int i, size, flag, rec = 1;
 
     if (dbf != NULL) {
         campo = dbf->campos;
@@ -761,20 +762,29 @@ void list(DBF *dbf, Fila *F) {
                 nivelDado = dbf->campos->Pdados;
                 while (nivelDado != NULL) {
                     campo = dbf->campos;
-                    sprintf(linha, "%7d", i);
+                    sprintf(linha, "%7d", rec);
+                    flag = 0;
                     while(campo != NULL) {
                         dado = campo->Pdados;
+                        status = dbf->status;
 
                         for(int x = i; x > 1; x--) {
                             dado = dado->prox;
+                            status = status->prox;
                         }
     
                         if (dado != NULL) {
-                            extraiDado(campo, dado, linha);
+                            if (status->boolean) {
+                                extraiDado(campo, dado, linha);
+                                flag = 1;
+                            }
                         }
                         campo = campo->prox;
                     }
-                    inserir(F, linha);
+                    if (flag == 1) {
+                        inserir(F, linha);
+                        rec++;
+                    }
                     i++;
                     nivelDado = nivelDado->prox; //Nivel dado e i++ ajudam a definir quantos niveis pra baixo 
                     //é necessario ir para recuperar o reg atual
