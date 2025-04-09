@@ -44,9 +44,9 @@ int main() {
         dica1(0, "");
         dica2(0, "Enter a dBASE III PLUS command");
         baseCmd("Command Line");
-        if (existeDados(aberto)) {
-            baseRec(1, contaRecords(aberto));
-        }
+        // if (existeDados(aberto)) {
+        //     baseRec(1, contaRecords(aberto));
+        // }
         lerComando(comando);
         strSplit(comando, cmd, ' ');
         // gotoxy(5, 8);
@@ -203,7 +203,15 @@ int main() {
             break;
 
             case 13:
-                //Foi digitado o comando "RECALL"
+                extrairParametros(args, comando);
+                if(compare(args[1],"ALL")){
+                    reCallAll(&aberto,&F);
+                    
+                }else{
+                   reCall(&atual,&F); 
+                }
+                baseRec(1, contaRecords(aberto));
+                clear(&F);
             break;
 
             case 15:
