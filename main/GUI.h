@@ -11,6 +11,7 @@ void baseDBF(char*);
 void baseRec(int,int);
 void baseField(int,int);
 void baseNum();
+void baseDel(char str[]);
 void createCampos();
 void createCampos2();
 void mainScreen();
@@ -36,6 +37,7 @@ void mainScreen() {
     baseDir(" ");
     baseRec(0, 0);
     baseNum();
+    baseDel("ON");
     dica1(0, "Enter a dBASE III PLUS command");
 }
 
@@ -110,6 +112,13 @@ void baseNum() {
     textcolor(BLACK); textbackground(LIGHTGRAY);
     limparLinha(79, 86, 20);
     print2(79, 20, "Num");
+    textcolor(LIGHTGRAY); textbackground(BLACK);
+}
+
+void baseDel(char str[]) {
+    textcolor(BLACK); textbackground(LIGHTGRAY);
+    limparLinha(72, 77, 20);
+    print2(72, 20, str);
     textcolor(LIGHTGRAY); textbackground(BLACK);
 }
 

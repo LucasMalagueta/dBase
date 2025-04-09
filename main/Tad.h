@@ -17,7 +17,7 @@ struct dbf {
     char nomeDBF[50];
     char Data[11]; // "DD/MM/YYYY"
     char Hora[8];  // "HH:MM"
-    Status* status; // 'A' = Aberto, 'F' = Fechado
+    Status* status;
     Campo *campos; // Lista encadeada de campos
     DBF *prox;
 };
@@ -82,7 +82,9 @@ void list(DBF *dbf, Fila *F, char setDelete);
 void listFor(DBF *dbf, char campoA[], char alvo[], Fila *F, char setDelete);
 char compare2(char str[], char str2[]);
 char comparaDados(Dados *dado, Campo *campo, char alvo[]);
-void extraiDado(Campo *campo, Dados *dado, char *linha);
+void extraiDado(Campo *campo, Dados *dado, char *linha, Fila *F);
+void extraiMemo(Campo *campo, Dados *dado, char *linha, Fila *F);
+void resolveMemo(DBF *dbf, Campo *campo, Fila *F, int i, char *linha, char setDelete);
 
 //APPEND
 void Append(DBF **dbf, Status **pos);
@@ -117,6 +119,7 @@ int setDeleteOn();
 int setDeleteOff();
 
 //PACK
+void pack(DBF **dbf, Status **atual);
 
 //ZAP
 void zap(DBF **dbf);
@@ -171,7 +174,6 @@ void setDefaltTo(Unidade **unid, char dir[3]) {
             }else{
                 (*unid) = (*unid)->top;
             }
-            //*unid = ((*unid)->bottom != NULL) ? (*unid)->bottom : (*unid)->top;
         }
     }
 } 
@@ -756,7 +758,7 @@ void list(DBF *dbf, Fila *F, char setDelete) {
     Campo *campo = NULL;
     Dados *dado = NULL, *nivelDado = NULL;
     Status *status = NULL;
-    char linha[100], ch;
+    char linha[100], memo[65], ch;
     int i, size, flag, rec = 1, sint;
 
     if (dbf != NULL) {
@@ -772,8 +774,10 @@ void list(DBF *dbf, Fila *F, char setDelete) {
                 sprintf(linha, "%s", "Record#");
                 while(campo != NULL) {
                     //Size serve exclusivamente para logical
-                    size = (campo->Width == 1) ? 10 : campo->Width;
-                    sprintf(linha, "%s %-*s", linha, size, campo->FieldName);
+                    if(campo->Type != 'M') {
+                        size = (campo->Width == 1) ? 10 : campo->Width;
+                        sprintf(linha, "%s %-*s", linha, size, campo->FieldName);
+                    }
                     campo = campo->prox;
                 }
                 inserir(F, linha);
@@ -797,7 +801,7 @@ void list(DBF *dbf, Fila *F, char setDelete) {
                         if (dado != NULL) {
                             sint = (status->boolean) ? 1 : 0;
                             if (sint || setDelete) {
-                                extraiDado(campo, dado, linha);
+                                extraiDado(campo, dado, linha, F);
                                 flag = 1;
                             }
                         }
@@ -805,6 +809,9 @@ void list(DBF *dbf, Fila *F, char setDelete) {
                     }
                     if (flag == 1) {
                         inserir(F, linha);
+                        //Precisa repetir tudo ai em cima só que tem que ser depois de 
+                        resolveMemo(dbf, campo, F, i, linha, setDelete); // ja ter inserido os outros dados, 
+                        // entao fica macarronico mesmo, só por causa de MEMO ser muito grande
                         rec++;
                     }
                     i++;
@@ -816,7 +823,34 @@ void list(DBF *dbf, Fila *F, char setDelete) {
     }
 }
 
-void extraiDado(Campo *campo, Dados *dado, char *linha) {
+void resolveMemo(DBF *dbf, Campo *campo, Fila *F, int i, char *linha, char setDelete) {
+    Dados *dado = NULL;
+    Status *status = NULL;
+    int sint, flag;
+
+    campo = dbf->campos;
+    sprintf(linha, "%7c ", 200);
+    while(campo != NULL) {
+        dado = campo->Pdados;
+        status = dbf->status;
+
+        for(int x = i; x > 1 && dado != NULL && status != NULL; x--) {
+            dado = dado->prox;
+            status = status->prox;
+        }
+
+        if (dado != NULL) {
+            sint = (status->boolean) ? 1 : 0;
+            if (sint || setDelete) {
+                extraiMemo(campo, dado, linha, F);
+                flag = 1;
+            }
+        }
+        campo = campo->prox;
+    }
+}
+
+void extraiDado(Campo *campo, Dados *dado, char *linha, Fila *F) {
     switch (campo->Type) {
         case 'N':
             sprintf(linha, "%s %-*.*f", linha, campo->Width, campo->Dec, dado->tipo.valorN);
@@ -833,9 +867,14 @@ void extraiDado(Campo *campo, Dados *dado, char *linha) {
         case 'C':
             sprintf(linha, "%s %-*s", linha, campo->Width, dado->tipo.valorC);
         break;
-        
+    }
+}
+
+void extraiMemo(Campo *campo, Dados *dado, char *linha, Fila *F) {
+    switch (campo->Type) {        
         case 'M':
-            sprintf(linha, "%s %-*s", linha, campo->Width, dado->tipo.valorM);
+            sprintf(linha, "%s%7s%-*s", linha, "MEMO - ", campo->Width, dado->tipo.valorM);
+            inserir(F, linha);
         break;
     }
 }
@@ -860,8 +899,10 @@ void listFor(DBF *dbf, char campoA[], char alvo[], Fila *F, char setDelete) {
                 //Guardar titulos
                 sprintf(linha, "%s", "Record#");
                 while(campo != NULL) {
-                    size = (campo->Width == 1) ? 10 : campo->Width;
-                    sprintf(linha, "%s %-*s", linha, size, campo->FieldName);
+                    if(campo->Type != 'M') {
+                        size = (campo->Width == 1) ? 10 : campo->Width;
+                        sprintf(linha, "%s %-*s", linha, size, campo->FieldName);
+                    }
                     campo = campo->prox;
                 }
                 inserir(F, linha);
@@ -910,11 +951,12 @@ void listFor(DBF *dbf, char campoA[], char alvo[], Fila *F, char setDelete) {
                             }
         
                             if (dado != NULL) {
-                                extraiDado(campo, dado, linha);        
+                                extraiDado(campo, dado, linha, F);        
                             }
                             campo = campo->prox;
                         }
                         inserir(F, linha);
+                        resolveMemo(dbf, campo, F, i, linha, setDelete);
                     }
 
                     i++;
@@ -1140,7 +1182,7 @@ void display(DBF *dbf, Status *pos, Fila *F, char setDelete) {
     int i, size, sint;
     Campo *campo = NULL;
     Dados *nivelDado = NULL;
-    char linha[100];
+    char linha[100], memo[65];
 
     if (dbf != NULL) {
         campo = dbf->campos;
@@ -1154,8 +1196,10 @@ void display(DBF *dbf, Status *pos, Fila *F, char setDelete) {
                 //Guardar titulos
                 sprintf(linha, "%s", "Record#");
                 while(campo != NULL) {
-                    size = (campo->Width == 1) ? 10 : campo->Width;
-                    sprintf(linha, "%s %-*s", linha, size, campo->FieldName);
+                    if(campo->Type != 'M') {
+                        size = (campo->Width == 1) ? 10 : campo->Width;
+                        sprintf(linha, "%s %-*s", linha, size, campo->FieldName);
+                    }
                     campo = campo->prox;
                 }
                 inserir(F, linha);
@@ -1170,12 +1214,13 @@ void display(DBF *dbf, Status *pos, Fila *F, char setDelete) {
                         nivelDado = campo->Patual;
 
                         if (nivelDado != NULL && pos->boolean) {
-                            extraiDado(campo, nivelDado, linha);
+                            extraiDado(campo, nivelDado, linha, F);
                         }
                         
                         campo = campo->prox;
                     }
                     inserir(F, linha);
+                    resolveMemo(dbf, campo, F, i, linha, setDelete);
                 }
             }
         }

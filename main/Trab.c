@@ -78,11 +78,13 @@ int main() {
                         }
                     }
                 } else {
-                    if (compare(args[1], "DELETE") && compare(args[2], "OFF")) {
+                    if (compare(args[1], "DELETED") && compare(args[2], "OFF")) {
                         setDelete = setDeleteOff();
+                        baseDel("OFF");
                     } else {
-                        if (compare(args[1], "DELETE") && compare(args[2], "ON")) {
+                        if (compare(args[1], "DELETED") && compare(args[2], "ON")) {
                             setDelete = setDeleteOn();
+                            baseDel("ON");
                         }
                     }         
                 }
