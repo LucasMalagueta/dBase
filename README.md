@@ -1,3 +1,8 @@
+[![Made with C](https://img.shields.io/badge/Made%20with-C-blue.svg)](https://en.wikipedia.org/wiki/C_(programming_language))
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Status](https://img.shields.io/badge/Status-Em%20Desenvolvimento-orange.svg)]()
+
+
 # 🧠 dBase Dinâmico (Simulador Lógico)
 
 Este projeto é um **simulador do ambiente dBase**, implementado com **listas encadeadas dinâmicas**, como parte do trabalho da disciplina **Estruturas de Dados II** (FIPP – Unoeste). Ele simula o comportamento de arquivos `.DBF`, mas **não cria arquivos reais no disco** — tudo é realizado logicamente em memória, utilizando estruturas de dados.
@@ -36,9 +41,11 @@ Simular o funcionamento de um sistema semelhante ao dBase clássico (anos 80/90)
 
 A interface do sistema é textual e interativa, inspirada na linha de comando do dBase. O usuário digita os comandos como faria no dBase original, e o sistema interpreta e executa conforme a sintaxe correta.
 
+![Interface](image.png)
+
 ## 🎓 Sobre
 
-Projeto desenvolvido por Mateus Silva Maciel e Lucas Ataide Malagueta para a disciplina de **Estruturas de Dados II** — 1º Bimestre de 2025  
+Projeto desenvolvido por **Mateus Silva Maciel** e **Lucas Ataide Malagueta** para a disciplina de **Estruturas de Dados II** — 1º Bimestre de 2025  
 **Professor:** Francisco Assis da Silva  
 **Curso:** Sistemas de Informação – FIPP/UNOESTE
 
