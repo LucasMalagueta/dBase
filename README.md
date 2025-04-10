@@ -1,6 +1,5 @@
 [![Made with C](https://img.shields.io/badge/Made%20with-C-blue.svg)](https://en.wikipedia.org/wiki/C_(programming_language))
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Status](https://img.shields.io/badge/Status-Em%20Desenvolvimento-orange.svg)]()
+[![Status](https://img.shields.io/badge/Status-Concluído-brightgreen.svg)]()
 
 
 # 🧠 dBase Dinâmico (Simulador Lógico)
