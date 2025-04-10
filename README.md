@@ -38,7 +38,7 @@ A interface do sistema é textual e interativa, inspirada na linha de comando do
 
 ## 🎓 Sobre
 
-Projeto desenvolvido por [Seu Nome] e [Nome do colega] para a disciplina de **Estruturas de Dados II** — 1º Bimestre de 2025  
+Projeto desenvolvido por Mateus Silva Maciel e Lucas Ataide Malagueta para a disciplina de **Estruturas de Dados II** — 1º Bimestre de 2025  
 **Professor:** Francisco Assis da Silva  
 **Curso:** Sistemas de Informação – FIPP/UNOESTE
 
