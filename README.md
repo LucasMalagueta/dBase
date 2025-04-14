@@ -44,7 +44,7 @@ A interface do sistema é textual e interativa, inspirada na linha de comando do
 
 ## 🎓 Sobre
 
-Projeto desenvolvido por **Mateus Silva Maciel** e **Lucas Ataide Malagueta** para a disciplina de **Estruturas de Dados II** — 1º Bimestre de 2025  
+Projeto desenvolvido por [**Mateus Silva Maciel**](https://github.com/lucasdev) e **Lucas Ataide Malagueta** para a disciplina de **Estruturas de Dados II** — 1º Bimestre de 2025  
 **Curso:** Sistemas de Informação – FIPP/UNOESTE
 
 ---
