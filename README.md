@@ -40,7 +40,7 @@ Simular o funcionamento de um sistema semelhante ao dBase clássico (anos 80/90)
 
 A interface do sistema é textual e interativa, inspirada na linha de comando do dBase. O usuário digita os comandos como faria no dBase original, e o sistema interpreta e executa conforme a sintaxe correta.
 
-![Interface](image.png)
+![Interface](PDF/image.png)
 
 ## 🎓 Sobre
 
