@@ -43,7 +43,7 @@ The interface is done with a modified version of TDM-GCC and [conio2.h](https://
 ### APPEND
 ![APPEND](assets/APPEND.gif)
 
-### LIST
+### LIST and CLEAR
 ![LIST](assets/LIST.gif)
 
 ### LOCATE, GOTO and DISPLAY
