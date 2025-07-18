@@ -53,7 +53,6 @@ The interface is done with a modified version of TDM-GCC and [conio2.h](https://
 
 ## Credit
 
-Made by [**Mateus SM**](https://github.com/mateus-sm) and [**Lucas Ataide Malagueta**](https://github.com/LucasMalagueta).
-2025
+Made by [**Mateus SM**](https://github.com/mateus-sm) and [**Lucas Ataide Malagueta**](https://github.com/LucasMalagueta) 2025.
 
 ---
