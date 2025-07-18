@@ -2,7 +2,7 @@
 This project aims to build a dBase like environment in C including its GUI. The main object in doing so is to implement concepts of Data Structure course, so all the operations will be done in memory using dynamic linked lists. 
 
 ## Scope
-Simulate a system like classic dBase (80's / 90's) manipulating registers e data structures files ".DBF" with operations of Create, Read, Update, Delete and more
+Simulate a system like classic dBase (80's / 90's) manipulating fields, records and data structures files ".DBF" with operations of Create, Read, Update, Delete and more
 
 ![SCOPE](assets/Scope.png)
 
@@ -45,7 +45,7 @@ The interface is done with a modified version of TDM-GCC and [conio2.h](https://
 ### APPEND
 ![APPEND](assets/APPEND.gif)
 
-### LIST
+### LIST and CLEAR
 ![LIST](assets/LIST.gif)
 
 ### LOCATE, GOTO and DISPLAY
