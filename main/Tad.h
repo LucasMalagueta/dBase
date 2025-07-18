@@ -224,7 +224,7 @@ void Create(Unidade **unid, DBF **dbf, char nome[50]) {
         *dbf = aux;
         //Criar campos
         dica1(0, "CREATE.");
-        dica2(0, "[SPACE] Criar Campo. [Esc] encerrar CREATE.");
+        dica2(0, "[SPACE] Create field. [Esc] end CREATE.");
         gotoxy(7, 19);
         op = getch();
         createCampos();
@@ -251,14 +251,14 @@ void Create(Unidade **unid, DBF **dbf, char nome[50]) {
 
             //Condição de parada if positivo
             if (x == 52 && y >= 18) {
-                dica1(0, "[SPACE] Encerrar CREATE.");
-                dica2(0, "Campos lotados!");
+                dica1(0, "[SPACE] end CREATE.");
+                dica2(0, "Fields full!");
                 gotoxy(7, 19);
                 op = getch();
                 op = 27;
             } else {
                 dica1(0, "CREATE.");
-                dica2(0, "[SPACE] Criar Campo. [Esc] encerrar CREATE.");
+                dica2(0, "[SPACE] Create field. [Esc] end CREATE.");
                 gotoxy(7, 19);
                 op = getch();
                 fflush(stdin);

@@ -188,7 +188,10 @@ int main() {
             case 9:
                 //Foi digitado o comando "GOTO"
                 extrairParametros(args, comando);
+                sprintf(comando, ". %s %s", args[0], args[1]);
+                inserir(&F, comando);
                 gotodado(&aberto, &atual, args[1]);
+                exibir(&F);
             break;
 
             case 10:
