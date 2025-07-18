@@ -4,9 +4,11 @@ This project aims to build a dBase like environment in C including its GUI. The 
 ## Scope
 Simulate a system like classic dBase (80's / 90's) manipulating registers e data structures files ".DBF" with operations of Create, Read, Update, Delete and more
 
+![SCOPE](assets/Scope.png)
+
 ## List of Functionalities
 
-- `SET DEFAULT TO`: Select a logic unity (`D:` or `C:`)
+- `SET DEFAULT TO`: Select a logic Drive (`D:` or `C:`)
 - `CREATE`: Create a `.DBF` file (in memory)
 - `DIR`: Lists the files created in the current unity
 - `USE`: Open a file
