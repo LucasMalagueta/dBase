@@ -24,7 +24,7 @@ Simulate a system like classic dBase (80's / 90's) manipulating fields, records 
 
 ## GUI
 
-The interface is done with a modified version of TDM-GCC and [conio2.h](https://conio.sourceforge.net/) the dowload can be found [here](https://github.com/mateus-sm/Conio2-VsCode).
+The interface is done with a modified version of [TDM-GCC](https://jmeubank.github.io/tdm-gcc/)(4.7.1 32bit) and [conio2.h](https://conio.sourceforge.net/) the dowload can be found [here](https://github.com/mateus-sm/Conio2-VsCode).
 
 ![GUI](assets/image.png)
 
