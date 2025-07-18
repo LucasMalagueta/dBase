@@ -2,7 +2,7 @@
 This project aims to build a dBase like environment in C including its GUI. The main object in doing so is to implement concepts of Data Structure course, so all the operations will be done in memory using dynamic linked lists. 
 
 ## Scope
-Simulate a system like classic dBase (80's / 90's) manipulating registers e data structures files ".DBF" with operations of Create, Read, Update, Delete and more
+Simulate a system like classic dBase (80's / 90's) manipulating fields, records and data structures files ".DBF" with operations of Create, Read, Update, Delete and more
 
 ## List of Functionalities
 
