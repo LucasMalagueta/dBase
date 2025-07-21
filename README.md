@@ -9,8 +9,8 @@ Simulate a system like classic dBase (80's / 90's) manipulating fields, records 
 ## List of Functionalities
 
 - `SET DEFAULT TO`: Select a logic Drive (`D:` or `C:`)
-- `CREATE`: Create a `.DBF` file (in memory)
-- `DIR`: Lists the files created in the current unity
+- `CREATE`: Create a ".DBF" file (in memory)
+- `DIR`: Lists the files created in the current drive
 - `USE`: Open a file
 - `LIST STRUCTURE`: Show all fields of the file structure 
 - `APPEND`: Append new records to the `.DBF` file 
